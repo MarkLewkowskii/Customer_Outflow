@@ -94,16 +94,16 @@
    ```
 3. Використати веб-інтерфейс для прогнозування.
 
-## Автори
+### Автори
 - **Maryna Dudik - Team Lead**: Організація роботи, документація.
 - **Heorhii Kaplytskyi - Scrum-master**: Організація роботи, документація.
-- ** - Data Analyst**: Аналіз даних.
-- ** - Data Engineer**: Підготовка даних.
-- ** - Data Scientist**: Навчання моделей.
-- ** - Backend Developer**: Реалізація інтерфейсу.
-- ** - DevOps-інженер**: Контейнеризація.
+- **Gleb - Data Analyst**: Аналіз даних.
+- **Gleb - Data Engineer**: Підготовка даних.
+- **Liana Lotarets - Data Scientist**: Навчання моделей.
+- **Inna Bogutska - Backend Developer**: Реалізація інтерфейсу.
+- **Maryna Dudik - DevOps-інженер**: Контейнеризація.
 
 
-##Ліцензія
+### Ліцензія
 
 Цей проєкт розповсюджується під ліцензією MIT. Дивіться файл [LICENSE](https://www.google.com/url?sa=E&source=gmail&q=LICENSE) для отримання додаткової інформації.
