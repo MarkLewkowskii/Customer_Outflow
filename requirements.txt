@@ -42,3 +42,7 @@ tzdata==2024.2 ; python_version >= "3.10"
 urllib3==2.2.3 ; python_version >= "3.10"
 werkzeug==3.0.6 ; python_version >= "3.10"
 zipp==3.21.0 ; python_version >= "3.10"
+
+Faker~=33.1.0
+pandas~=2.2.3
+scikit-learn~=1.6.0
