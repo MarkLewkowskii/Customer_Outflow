@@ -1,6 +1,7 @@
 from dash import Dash, dcc, html, Input, Output, State
 import pandas as pd
 from model_training import predict
+from faker_new_client import generate_fake_client_data
 
 app = Dash(__name__)
 
@@ -137,11 +138,16 @@ app.layout = html.Div([
                     ),
                 ]),
                 
-                # Кнопка прогнозування
+                # Кнопки
                 html.Button(
                     "Зробити прогноз",
                     id="predict-button",
                     style=BUTTON_STYLE
+                ),
+                html.Button(
+                    "Випадкові дані",
+                    id="random-button",
+                    style={**BUTTON_STYLE, "marginTop": "10px"}
                 ),
             ]),
         ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
@@ -157,6 +163,36 @@ app.layout = html.Div([
     ])
 ])
 
+# Callback для генерації випадкових даних
+@app.callback(
+    [Output("subscription-age", "value"),
+     Output("bill-avg", "value"),
+     Output("remaining-contract", "value"),
+     Output("download-avg", "value"),
+     Output("upload-avg", "value"),
+     Output("service-failure-count", "value"),
+     Output("is-tv-subscriber", "value"),
+     Output("is-movie-package", "value"),
+     Output("download-over-limit", "value")],
+    [Input("random-button", "n_clicks")]
+)
+def fill_random_data(n_clicks):
+    if n_clicks is None:
+        return [None] * 9  # Початкове значення
+    fake_data = generate_fake_client_data()
+    return [
+        fake_data["subscription_age"],
+        fake_data["bill_avg"],
+        fake_data["reamining_contract"],
+        fake_data["download_avg"],
+        fake_data["upload_avg"],
+        fake_data["service_failure_count"],
+        fake_data["is_tv_subscriber"],
+        fake_data["is_movie_package_subscriber"],
+        fake_data["download_over_limit"]
+    ]
+
+# Callback для прогнозу
 @app.callback(
     [Output("prediction-output", "children"),
      Output("prediction-details", "children")],
@@ -200,6 +236,7 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
         # Отримання прогнозу
         result = predict(input_data)
         prediction_value = result['prediction'].iloc[0]
+        probability = result['probability_of_churn'].iloc[0]
         
         # Форматування виведення
         risk_level = "Високий" if prediction_value == 1 else "Низький"
@@ -207,14 +244,9 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
         
         prediction_text = html.Div([
             html.H3(f"{risk_level} ризик відтоку", style={'color': color}),
-            html.P(
-                "Клієнт має високу ймовірність припинення користування послугами."
-                if prediction_value == 1 else
-                "Клієнт ймовірно продовжить користуватися послугами."
-            )
+            html.P(f"Ймовірність відтоку клієнта: {probability:.2f}%"),
         ])
         
-        # Додаткова інформація
         details = html.Div([
             html.H5("Введені дані:"),
             html.Ul([
@@ -233,7 +265,9 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
         return prediction_text, details
     
     except Exception as e:
-        return f"Помилка при обробці даних: {str(e)}", ""
+        # Повернення дефолтних значень у разі помилки
+        return html.Div(f"Помилка при обробці даних: {str(e)}", style={"color": "red"}), ""
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
