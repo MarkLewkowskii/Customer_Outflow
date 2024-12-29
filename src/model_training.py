@@ -16,7 +16,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Шляхи до файлів
 medians_path = os.path.join(BASE_DIR, "../data/processed/medians.json")
 scaler_path = os.path.join(BASE_DIR, "../data/processed/scaler.pkl")
-"
 
 # Очікувані стовпці
 EXPECTED_COLUMNS = [
