@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
 
 # Встановлюємо Poetry
 ENV POETRY_VERSION=1.6.1
-RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN curl -sSL https://install.python-poetry.org | python3 - \
+    && chmod +x /root/.local/bin/poetry
 ENV PATH="/root/.local/bin:$PATH"
 
 # Встановлюємо робочу директорію
@@ -17,17 +18,16 @@ WORKDIR /app
 # Копіюємо файли конфігурації Poetry
 COPY pyproject.toml poetry.lock ./
 
-# Встановлюємо залежності проекту без їх інсталяції в систему
+# Встановлюємо залежності проекту
 RUN poetry install --no-root --only main
 
-# Копіюємо код проекту
+# Копіюємо решту файлів проекту
 COPY src/ ./src/
-
-# Копіюємо папку models, яка містить файл моделі
 COPY models/ ./models/
-
-# Копіюємо папку data/processed
 COPY data/processed/ ./data/processed/
 
-# Вказуємо команду запуску
-CMD ["poetry", "run", "python", "src/model_training.py"]
+# Визначаємо порт для Dash
+EXPOSE 8050
+
+# Вказуємо команду запуску evaluation.py
+CMD ["poetry", "run", "python", "src/evaluation.py"]
