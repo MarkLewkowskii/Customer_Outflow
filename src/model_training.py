@@ -1,52 +1,75 @@
 import pandas as pd
 import joblib
 from data_preparation import preprocess_user_data
+from faker_new_client import generate_fake_client_data, generate_and_corrupt_data
 
 # Шлях до збереженої моделі
-model_path = "models/saved_model.pkl"
+model_path = r"models\model_RandomForest.joblib"
 
 # Шляхи до медіан і scaler
 medians_path = "data/processed/medians.json"
 scaler_path = "data/processed/scaler.pkl"
 
+# Очікувані стовпці
+EXPECTED_COLUMNS = [
+    "subscription_age", "bill_avg", "reamining_contract",
+    "download_avg", "upload_avg", "is_tv_subscriber",
+    "is_movie_package_subscriber", "download_over_limit",
+    "service_failure_count"
+]
+
+def ensure_columns(data: pd.DataFrame, expected_columns: list) -> pd.DataFrame:
+    """
+    Гарантує, що всі очікувані стовпці присутні та розташовані в правильному порядку.
+    """
+    for column in expected_columns:
+        if column not in data.columns:
+            data[column] = None  # Додати відсутній стовпець із значенням None
+    return data[expected_columns]  # Гарантуємо порядок ознак
+
 def predict(data: pd.DataFrame) -> pd.DataFrame:
-    """
-    Здійснює передбачення на основі підготовлених даних і збереженої моделі.
-    
-    Параметри:
-        data (pd.DataFrame): Сирі дані, отримані від користувача.
-        
-    Повертає:
-        pd.DataFrame: Результати передбачення.
-    """
-    # Завантаження моделі
     model = joblib.load(model_path)
-    
-    # Попередня обробка даних
+
+    # Визначення очікуваного порядку колонок
+    expected_order = [
+        'is_tv_subscriber', 'is_movie_package_subscriber', 'subscription_age',
+        'bill_avg', 'reamining_contract', 'service_failure_count', 'download_avg',
+        'upload_avg', 'download_over_limit'
+    ]
+
+    # Гарантуємо наявність і правильний порядок колонок
+    data = ensure_columns(data, expected_order)
     processed_data = preprocess_user_data(data, medians_path, scaler_path)
-    
-    # Здійснення передбачення
-    predictions = model.predict(processed_data)
-    
-    # Додавання передбачень до даних
-    data['prediction'] = predictions
-    
+
+    # Перевірка порядку колонок після обробки
+    processed_data = processed_data[expected_order]
+
+    # Використання predict_proba для отримання ймовірностей
+    probabilities = model.predict_proba(processed_data)
+
+    # Чому використовується predict_proba:
+    # predict_proba повертає ймовірності для кожного класу, що дозволяє оцінити,
+    # наскільки модель впевнена у своєму передбаченні. Зокрема, ми використовуємо
+    # ймовірність для класу "1" (відмова), щоб визначити шанс, що клієнт відмовиться.
+
+    # Отримання ймовірностей для класу 1 (відмова) та конвертація у відсотки
+    data['probability_of_churn'] = (probabilities[:, 1] * 100).round(2)
     return data
 
 if __name__ == "__main__":
-    # Приклад сирих даних
-    user_data = pd.DataFrame({
-        'subscription_age': [12],
-        'bill_avg': [50],
-        'reamining_contract': [None],  # Пропуск
-        'download_avg': [75],
-        'upload_avg': [None],  # Пропуск
-        'is_tv_subscriber': [1],
-        'is_movie_package_subscriber': [0],
-        'download_over_limit': [0],
-        'churn': [0]
-    })
-    
+    # Генерація даних для нового клієнта
+    fake_client_data = generate_fake_client_data()
+    user_data = pd.DataFrame([fake_client_data])
+
+
     # Передбачення
     result = predict(user_data)
-    print(result)
+    print("Результати з повних даних:", result)
+
+    # Генерація неповних даних, для перевірки як модель справляється з обробкою
+    corrupt_client_data = generate_and_corrupt_data()
+    corrupt_user_data = pd.DataFrame([corrupt_client_data])
+
+    # Передбачення
+    result = predict(corrupt_user_data)
+    print("Результати з неповних даних:", result)
