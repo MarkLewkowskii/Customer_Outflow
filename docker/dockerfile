@@ -1,0 +1,33 @@
+# Використовуємо офіційний Python-образ
+FROM python:3.10-slim
+
+# Встановлюємо необхідні системні пакети
+RUN apt-get update && apt-get install -y \
+    build-essential curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Встановлюємо Poetry
+ENV POETRY_VERSION=1.6.1
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH="/root/.local/bin:$PATH"
+
+# Встановлюємо робочу директорію
+WORKDIR /app
+
+# Копіюємо файли конфігурації Poetry
+COPY pyproject.toml poetry.lock ./
+
+# Встановлюємо залежності проекту без їх інсталяції в систему
+RUN poetry install --no-root --only main
+
+# Копіюємо код проекту
+COPY src/ ./src/
+
+# Копіюємо папку models, яка містить файл моделі
+COPY models/ ./models/
+
+# Копіюємо папку data/processed
+COPY data/processed/ ./data/processed/
+
+# Вказуємо команду запуску
+CMD ["poetry", "run", "python", "src/model_training.py"]
