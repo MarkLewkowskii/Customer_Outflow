@@ -3,7 +3,7 @@ import joblib
 from data_preparation import preprocess_user_data
 
 # Шлях до збереженої моделі
-model_path = "models/saved_model.pkl"
+model_path = "models/model_HistGradientBoosting.joblib"
 
 # Шляхи до медіан і scaler
 medians_path = "data/processed/medians.json"
