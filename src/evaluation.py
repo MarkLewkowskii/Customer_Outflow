@@ -269,5 +269,6 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
         return html.Div(f"Помилка при обробці даних: {str(e)}", style={"color": "red"}), ""
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+if __name__ == "__main__":
+    app.run_server(debug=True, host="0.0.0.0", port=8050)
+
