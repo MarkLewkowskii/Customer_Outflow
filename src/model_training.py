@@ -54,6 +54,9 @@ def predict(data: pd.DataFrame) -> pd.DataFrame:
 
     # Отримання ймовірностей для класу 1 (відмова) та конвертація у відсотки
     data['probability_of_churn'] = (probabilities[:, 1] * 100).round(2)
+
+    # Додаємо колонку 'prediction'
+    data['prediction'] = (probabilities[:, 1] > 0.5).astype(int)
     return data
 
 if __name__ == "__main__":
