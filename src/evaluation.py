@@ -1,7 +1,6 @@
 from dash import Dash, dcc, html, Input, Output, State
 import pandas as pd
 import plotly.express as px
-from model_training import predict
 from faker_new_client import generate_fake_client_data
 
 # Підключення Bootstrap через CDN
@@ -9,7 +8,9 @@ app = Dash(__name__, external_stylesheets=[
     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 ])
 
-# Макет програми
+# Глобальні змінні для збереження всіх прогнозів
+all_predictions = []
+
 # Макет програми
 app.layout = html.Div([
     # Header
@@ -169,9 +170,9 @@ app.layout = html.Div([
             # Графік
             html.Div(className="mt-4", children=[
                 html.Div(className="card shadow-sm", children=[
-                    html.Div(className="card-header text-white bg-info", children="Статистика точності"),
+                    html.Div(className="card-header text-white bg-info", children="Історія прогнозів"),
                     html.Div(className="card-body", children=[
-                        dcc.Graph(id="accuracy-graph")  # Графік
+                        dcc.Graph(id="history-graph")
                     ])
                 ])
             ])
@@ -219,6 +220,7 @@ app.layout = html.Div([
      Output("download-over-limit", "value")],
     [Input("random-button", "n_clicks")]
 )
+
 def fill_random_data(n_clicks):
     if n_clicks is None:
         return [None] * 9  # Початкове значення
@@ -238,7 +240,8 @@ def fill_random_data(n_clicks):
 # Callback для прогнозу
 @app.callback(
     [Output("prediction-output", "children"),
-     Output("prediction-details", "children")],
+     Output("prediction-details", "children"),
+     Output("history-graph", "figure")],
     [Input("predict-button", "n_clicks")],
     [State("subscription-age", "value"),
      State("bill-avg", "value"),
@@ -253,14 +256,16 @@ def fill_random_data(n_clicks):
 def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
                     download_avg, upload_avg, service_failure_count,
                     is_tv, is_movie, over_limit):
+    global all_predictions
+
     if n_clicks is None:
-        return "Введіть дані та натисніть кнопку для прогнозування", ""
+        return "Введіть дані та натисніть кнопку для прогнозування", "", px.line(title="Історія прогнозів")
 
     # Перевірка наявності всіх необхідних даних
     if any(v is None for v in [subscription_age, bill_avg, remaining_contract,
-                              download_avg, upload_avg, service_failure_count,
-                              is_tv, is_movie, over_limit]):
-        return "Будь ласка, заповніть усі поля", ""
+                               download_avg, upload_avg, service_failure_count,
+                               is_tv, is_movie, over_limit]):
+        return "Будь ласка, заповніть усі поля", "", px.line(title="Історія прогнозів")
 
     try:
         # Завантаження моделі
@@ -285,12 +290,14 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
         prediction_value = model.predict(input_data)[0]
         probability = model.predict_proba(input_data)[0][1] * 100
 
-        # Форматування виведення
-        risk_level = "Високий" if prediction_value == 1 else "Низький"
-        color = "red" if prediction_value == 1 else "green"
+        all_predictions.append({
+            "Ймовірність відтоку (%)": probability,
+            "Прогноз": "Високий ризик" if prediction_value == 1 else "Низький ризик",
+            "Ітерація": len(all_predictions) + 1
+        })
 
         prediction_text = html.Div([
-            html.H3(f"{risk_level} ризик відтоку", style={'color': color}),
+            html.H3(f"{'Високий' if prediction_value == 1 else 'Низький'} ризик відтоку", style={'color': 'red' if prediction_value == 1 else 'green'}),
             html.P(f"Ймовірність відтоку клієнта: {probability:.2f}%"),
         ])
 
@@ -309,11 +316,25 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
             ])
         ])
 
-        return prediction_text, details
+        # Побудова графіка історії прогнозів
+        history_df = pd.DataFrame(all_predictions)
+        fig = px.line(
+            history_df,
+            x="Ітерація",
+            y="Ймовірність відтоку (%)",
+            markers=True,
+            title="Історія прогнозів"
+        )
+        fig.update_layout(
+            xaxis_title="Ітерація",
+            yaxis_title="Ймовірність відтоку (%)",
+            template="plotly_white"
+        )
+
+        return prediction_text, details, fig
 
     except Exception as e:
-        # Повернення повідомлення про помилку
-        return html.Div(f"Помилка при обробці даних: {str(e)}", style={"color": "red"}), ""
+        return html.Div(f"Помилка при обробці даних: {str(e)}", style={"color": "red"}), "", px.line(title="Історія прогнозів")
 
 
 if __name__ == "__main__":
