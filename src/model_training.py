@@ -1,8 +1,9 @@
 import pandas as pd
 import joblib
+import os
 from data_preparation import preprocess_user_data
 from faker_new_client import generate_fake_client_data, generate_and_corrupt_data
-import os
+
 # Шлях до збереженої моделі
 model_path = os.path.join(os.getcwd(), 'models', 'model_RandomForest.joblib')
 
@@ -16,6 +17,11 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Шляхи до файлів
 medians_path = os.path.join(BASE_DIR, "../data/processed/medians.json")
 scaler_path = os.path.join(BASE_DIR, "../data/processed/scaler.pkl")
+
+for path in [model_path, medians_path, scaler_path]:
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Файл не знайдено: {path}")
+
 
 # Очікувані стовпці
 EXPECTED_COLUMNS = [
