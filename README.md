@@ -178,7 +178,7 @@
 
 ### **1. Клонування репозиторію**
 ```bash
-git clone https://github.com/your-repo/Customer_Outflow.git
+git clone https://github.com/MarkLewkowskii/Customer_Outflow.git
 cd Customer_Outflow
 ```
 
