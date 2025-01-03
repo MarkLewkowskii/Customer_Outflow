@@ -237,7 +237,7 @@ docker-compose up
 ## **Використані інструменти**
 
 - **EDA**: `Pandas`, `Matplotlib`, `Seaborn`.
-- **Моделі**: `Scikit-learn`, `XGBoost`.
+- **Моделі**: `Scikit-learn`.
 - **Веб-інтерфейс**: `Dash`, `Plotly`, `Bootstrap`.
 - **Контейнеризація**: `Docker`.
 - **Deploy**: `Koyeb`.
