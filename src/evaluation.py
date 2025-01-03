@@ -1,6 +1,6 @@
-from dash import Dash, dcc, html, Input, Output, State
 import pandas as pd
 import plotly.express as px
+from dash import Dash, dcc, html, Input, Output, State
 from faker_new_client import generate_fake_client_data
 
 # Підключення Bootstrap через CDN
@@ -253,6 +253,7 @@ def fill_random_data(n_clicks):
      State("is-movie-package", "value"),
      State("download-over-limit", "value")]
 )
+
 def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
                     download_avg, upload_avg, service_failure_count,
                     is_tv, is_movie, over_limit):
