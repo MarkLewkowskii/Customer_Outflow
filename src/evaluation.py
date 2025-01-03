@@ -1,165 +1,209 @@
-from dash import Dash, dcc, html, Input, Output, State
 import pandas as pd
-from model_training import predict
+import plotly.express as px
+from dash import Dash, dcc, html, Input, Output, State
 from faker_new_client import generate_fake_client_data
 
-app = Dash(__name__)
+# Підключення Bootstrap через CDN
+app = Dash(__name__, external_stylesheets=[
+    "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+])
 
-# Стилі
-CARD_STYLE = {
-    'padding': '20px',
-    'margin': '10px',
-    'borderRadius': '5px',
-    'boxShadow': '0 4px 6px 0 rgba(0, 0, 0, 0.1)',
-    'backgroundColor': 'white'
-}
+# Глобальні змінні для збереження всіх прогнозів
+all_predictions = []
 
-INPUT_STYLE = {
-    'width': '100%',
-    'marginBottom': '10px',
-    'padding': '8px',
-    'borderRadius': '4px',
-    'border': '1px solid #ddd'
-}
-
-BUTTON_STYLE = {
-    'width': '100%',
-    'padding': '10px',
-    'backgroundColor': '#007bff',
-    'color': 'white',
-    'border': 'none',
-    'borderRadius': '4px',
-    'cursor': 'pointer'
-}
-
-# Layout 
+# Макет програми
 app.layout = html.Div([
-    html.H1("Система прогнозування відтоку клієнтів", 
-            style={'textAlign': 'center', 'margin': '20px'}),
-    
-    html.Div([
-        # Ліва колонка - введення даних
-        html.Div([
-            html.Div(style=CARD_STYLE, children=[
-                html.H4("Дані клієнта"),
-                
-                # Числові входи
-                html.H5("Числові параметри", style={'marginTop': '20px'}),
-                html.Div([
-                    html.Label("Тривалість підписки (міс.)"),
-                    dcc.Input(
-                        id="subscription-age",
-                        type="number",
-                        min=0,
-                        style=INPUT_STYLE,
-                        placeholder="Введіть кількість місяців"
-                    ),
-                    
-                    html.Label("Середній рахунок"),
-                    dcc.Input(
-                        id="bill-avg",
-                        type="number",
-                        min=0,
-                        style=INPUT_STYLE,
-                        placeholder="Введіть суму в грн"
-                    ),
-                    
-                    html.Label("Залишок контракту (міс.)"),
-                    dcc.Input(
-                        id="remaining-contract",
-                        type="number",
-                        min=0,
-                        style=INPUT_STYLE,
-                        placeholder="Введіть кількість місяців"
-                    ),
-                    
-                    html.Label("Середнє завантаження (GB)"),
-                    dcc.Input(
-                        id="download-avg",
-                        type="number",
-                        min=0,
-                        style=INPUT_STYLE,
-                        placeholder="Введіть об'єм у GB"
-                    ),
-                    
-                    html.Label("Середнє вивантаження (GB)"),
-                    dcc.Input(
-                        id="upload-avg",
-                        type="number",
-                        min=0,
-                        style=INPUT_STYLE,
-                        placeholder="Введіть об'єм у GB"
-                    ),
-                    
-                    html.Label("Кількість збоїв сервісу"),
-                    dcc.Input(
-                        id="service-failure-count",
-                        type="number",
-                        min=0,
-                        style=INPUT_STYLE,
-                        placeholder="Введіть кількість збоїв"
-                    ),
-                ]),
-                
-                # Категоріальні входи
-                html.H5("Додаткові параметри", style={'marginTop': '20px'}),
-                html.Div([
-                    html.Label("Підписка на ТБ"),
-                    dcc.Dropdown(
-                        id="is-tv-subscriber",
-                        options=[
-                            {"label": "Так", "value": 1},
-                            {"label": "Ні", "value": 0}
-                        ],
-                        style={'marginBottom': '10px'},
-                        placeholder="Оберіть опцію"
-                    ),
-                    
-                    html.Label("Пакет фільмів"),
-                    dcc.Dropdown(
-                        id="is-movie-package",
-                        options=[
-                            {"label": "Так", "value": 1},
-                            {"label": "Ні", "value": 0}
-                        ],
-                        style={'marginBottom': '10px'},
-                        placeholder="Оберіть опцію"
-                    ),
-                    
-                    html.Label("Перевищення ліміту завантаження"),
-                    dcc.Dropdown(
-                        id="download-over-limit",
-                        options=[
-                            {"label": "Так", "value": 1},
-                            {"label": "Ні", "value": 0}
-                        ],
-                        style={'marginBottom': '20px'},
-                        placeholder="Оберіть опцію"
-                    ),
-                ]),
-                
-                # Кнопки
-                html.Button(
-                    "Зробити прогноз",
-                    id="predict-button",
-                    style=BUTTON_STYLE
-                ),
-                html.Button(
-                    "Випадкові дані",
-                    id="random-button",
-                    style={**BUTTON_STYLE, "marginTop": "10px"}
-                ),
+    # Header
+    html.Nav(className="navbar navbar-expand-lg navbar-dark bg-primary", children=[
+        html.Div(className="container-fluid", children=[
+            html.A("Project team 2", className="navbar-brand", href="#"),
+            html.Button(className="navbar-toggler", type="button", **{
+                "data-bs-toggle": "collapse",
+                "data-bs-target": "#navbarNav",
+                "aria-controls": "navbarNav",
+                "aria-expanded": "false",
+                "aria-label": "Toggle navigation"
+            }, children=[
+                html.Span(className="navbar-toggler-icon")
             ]),
-        ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
-        
-        # Права колонка - результати
-        html.Div([
-            html.Div(style=CARD_STYLE, children=[
-                html.H4("Результати прогнозування"),
-                html.Div(id="prediction-output"),
-                html.Div(id="prediction-details"),
+            html.Div(className="collapse navbar-collapse", id="navbarNav", children=[
+                html.Ul(className="navbar-nav", children=[
+                    html.Li(className="nav-item", children=[
+                        html.A("Головна", className="nav-link active", href="#")
+                    ]),
+                    html.Li(className="nav-item", children=[
+                        html.A("Про нас", className="nav-link", href="#footer")
+                    ])
+                ])
+            ])
+        ])
+    ]),
+
+    # Основний контент
+    html.Div(className="container py-5", children=[
+        html.Div(className="text-center mb-4", children=[
+            html.H1("Система прогнозування відтоку клієнтів", className="display-4 text-primary"),
+            html.P("Заповніть дані клієнта, щоб дізнатися прогноз", className="lead")
+        ]),
+
+        html.Div(className="row", children=[
+        # Ліва колонка: форма введення
+        html.Div(className="col-md-6 mb-4", children=[
+            html.Div(className="card shadow-sm", children=[
+                html.Div(className="card-header text-white bg-primary", children="Дані клієнта"),
+                html.Div(className="card-body", children=[
+                    html.Div(className="mb-3", children=[
+                        html.Label("Тривалість підписки (міс.)", className="form-label"),
+                        dcc.Input(
+                            id="subscription-age",
+                            type="number",
+                            placeholder="Введіть кількість місяців",
+                            className="form-control"
+                        )
+                    ]),
+                    html.Div(className="mb-3", children=[
+                        html.Label("Середній рахунок (грн)", className="form-label"),
+                        dcc.Input(
+                            id="bill-avg",
+                            type="number",
+                            placeholder="Введіть суму в грн",
+                            className="form-control"
+                        )
+                    ]),
+                    html.Div(className="mb-3", children=[
+                        html.Label("Залишок контракту (міс.)", className="form-label"),
+                        dcc.Input(
+                            id="remaining-contract",
+                            type="number",
+                            placeholder="Введіть кількість місяців",
+                            className="form-control"
+                        )
+                    ]),
+                    html.Div(className="mb-3", children=[
+                        html.Label("Середнє завантаження (GB)", className="form-label"),
+                        dcc.Input(
+                            id="download-avg",
+                            type="number",
+                            placeholder="Введіть об'єм у GB",
+                            className="form-control"
+                        )
+                    ]),
+                    html.Div(className="mb-3", children=[
+                        html.Label("Середнє вивантаження (GB)", className="form-label"),
+                        dcc.Input(
+                            id="upload-avg",
+                            type="number",
+                            placeholder="Введіть об'єм у GB",
+                            className="form-control"
+                        )
+                    ]),
+                    html.Div(className="mb-3", children=[
+                        html.Label("Кількість збоїв сервісу", className="form-label"),
+                        dcc.Input(
+                            id="service-failure-count",
+                            type="number",
+                            placeholder="Введіть кількість збоїв",
+                            className="form-control"
+                        )
+                    ]),
+                    html.Div(className="mb-3", children=[
+                        html.Label("Підписка на ТБ", className="form-label"),
+                        dcc.Dropdown(
+                            id="is-tv-subscriber",
+                            options=[
+                                {"label": "Так", "value": 1},
+                                {"label": "Ні", "value": 0}
+                            ],
+                            placeholder="Оберіть опцію",
+                            className="form-select"
+                        )
+                    ]),
+                    html.Div(className="mb-3", children=[
+                        html.Label("Пакет фільмів", className="form-label"),
+                        dcc.Dropdown(
+                            id="is-movie-package",
+                            options=[
+                                {"label": "Так", "value": 1},
+                                {"label": "Ні", "value": 0}
+                            ],
+                            placeholder="Оберіть опцію",
+                            className="form-select"
+                        )
+                    ]),
+                    html.Div(className="mb-3", children=[
+                        html.Label("Перевищення ліміту завантаження", className="form-label"),
+                        dcc.Dropdown(
+                            id="download-over-limit",
+                            options=[
+                                {"label": "Так", "value": 1},
+                                {"label": "Ні", "value": 0}
+                            ],
+                            placeholder="Оберіть опцію",
+                            className="form-select"
+                        )
+                    ]),
+                    html.Div(className="d-grid gap-2", children=[
+                        html.Button(
+                            "Зробити прогноз",
+                            id="predict-button",
+                            className="btn btn-primary"
+                        ),
+                        html.Button(
+                            "Випадкові дані",
+                            id="random-button",
+                            className="btn btn-secondary"
+                        )
+                    ])
+                ])
+            ])
+        ]),
+
+        # Права колонка: результати
+        html.Div(className="col-md-6", children=[
+            html.Div(className="card shadow-sm", children=[
+                html.Div(className="card-header text-white bg-success", children="Результати прогнозу"),
+                html.Div(className="card-body", children=[
+                    html.Div(id="prediction-output", className="alert alert-primary"),
+                    html.Div(id="prediction-details", className="alert alert-secondary mt-3")
+                ])
             ]),
-        ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginLeft': '4%'}),
+            # Графік
+            html.Div(className="mt-4", children=[
+                html.Div(className="card shadow-sm", children=[
+                    html.Div(className="card-header text-white bg-info", children="Історія прогнозів"),
+                    html.Div(className="card-body", children=[
+                        dcc.Graph(id="history-graph")
+                    ])
+                ])
+            ])
+        ])
+    ])
+]),
+
+    # Footer
+    html.Footer(id="footer", className="bg-dark text-white py-4 mt-4", children=[
+        html.Div(className="container", children=[
+            html.Div(className="row", children=[
+                # Перша колонка: автори
+                html.Div(className="col-md-8", children=[
+                    html.H5("Автори", className="text-uppercase fw-bold"),
+                    html.Ul(className="list-unstyled", children=[
+                        html.Li("Maryna Dudik - Team Lead: Організація роботи, документація."),
+                        html.Li("Heorhii Kaplytskyi - Scrum-master: Організація роботи, документація."),
+                        html.Li("Gleb - Data Analyst: Аналіз даних."),
+                        html.Li("Gleb - Data Engineer: Підготовка даних."),
+                        html.Li("Liana Lotarets - Data Scientist: Навчання моделей."),
+                        html.Li("Inna Bogutska - Backend Developer: Реалізація інтерфейсу."),
+                        html.Li("Maryna Dudik - DevOps-інженер: Контейнеризація.")
+                    ])
+                ]),
+                # Друга колонка: права
+                html.Div(className="col-md-4 text-md-end", children=[
+                    html.P("© 2024 Система прогнозування відтоку клієнтів."),
+                    html.P("Всі права захищено.")
+                ])
+            ])
+        ])
     ])
 ])
 
@@ -176,6 +220,7 @@ app.layout = html.Div([
      Output("download-over-limit", "value")],
     [Input("random-button", "n_clicks")]
 )
+
 def fill_random_data(n_clicks):
     if n_clicks is None:
         return [None] * 9  # Початкове значення
@@ -195,7 +240,8 @@ def fill_random_data(n_clicks):
 # Callback для прогнозу
 @app.callback(
     [Output("prediction-output", "children"),
-     Output("prediction-details", "children")],
+     Output("prediction-details", "children"),
+     Output("history-graph", "figure")],
     [Input("predict-button", "n_clicks")],
     [State("subscription-age", "value"),
      State("bill-avg", "value"),
@@ -207,20 +253,28 @@ def fill_random_data(n_clicks):
      State("is-movie-package", "value"),
      State("download-over-limit", "value")]
 )
+
 def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
-                   download_avg, upload_avg, service_failure_count,
-                   is_tv, is_movie, over_limit):
+                    download_avg, upload_avg, service_failure_count,
+                    is_tv, is_movie, over_limit):
+    global all_predictions
+
     if n_clicks is None:
-        return "Введіть дані та натисніть кнопку для прогнозування", ""
-    
+        return "Введіть дані та натисніть кнопку для прогнозування", "", px.line(title="Історія прогнозів")
+
     # Перевірка наявності всіх необхідних даних
     if any(v is None for v in [subscription_age, bill_avg, remaining_contract,
-                              download_avg, upload_avg, service_failure_count,
-                              is_tv, is_movie, over_limit]):
-        return "Будь ласка, заповніть усі поля", ""
-    
+                               download_avg, upload_avg, service_failure_count,
+                               is_tv, is_movie, over_limit]):
+        return "Будь ласка, заповніть усі поля", "", px.line(title="Історія прогнозів")
+
     try:
-        # Створення DataFrame з введених даних у правильному порядку
+        # Завантаження моделі
+        from joblib import load
+        model_path = 'models/model_RandomForest.joblib'  # Оригінальний шлях
+        model = load(model_path)
+
+        # Створення DataFrame з введених даних
         input_data = pd.DataFrame({
             'is_tv_subscriber': [int(is_tv)],
             'is_movie_package_subscriber': [int(is_movie)],
@@ -232,21 +286,22 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
             'upload_avg': [float(upload_avg)],
             'download_over_limit': [int(over_limit)]
         })
-        
+
         # Отримання прогнозу
-        result = predict(input_data)
-        prediction_value = result['prediction'].iloc[0]
-        probability = result['probability_of_churn'].iloc[0]
-        
-        # Форматування виведення
-        risk_level = "Високий" if prediction_value == 1 else "Низький"
-        color = "red" if prediction_value == 1 else "green"
-        
+        prediction_value = model.predict(input_data)[0]
+        probability = model.predict_proba(input_data)[0][1] * 100
+
+        all_predictions.append({
+            "Ймовірність відтоку (%)": probability,
+            "Прогноз": "Високий ризик" if prediction_value == 1 else "Низький ризик",
+            "Ітерація": len(all_predictions) + 1
+        })
+
         prediction_text = html.Div([
-            html.H3(f"{risk_level} ризик відтоку", style={'color': color}),
+            html.H3(f"{'Високий' if prediction_value == 1 else 'Низький'} ризик відтоку", style={'color': 'red' if prediction_value == 1 else 'green'}),
             html.P(f"Ймовірність відтоку клієнта: {probability:.2f}%"),
         ])
-        
+
         details = html.Div([
             html.H5("Введені дані:"),
             html.Ul([
@@ -261,14 +316,27 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
                 html.Li("Перевищення ліміту завантаження: " + ("Так" if over_limit else "Ні")),
             ])
         ])
-        
-        return prediction_text, details
-    
+
+        # Побудова графіка історії прогнозів
+        history_df = pd.DataFrame(all_predictions)
+        fig = px.line(
+            history_df,
+            x="Ітерація",
+            y="Ймовірність відтоку (%)",
+            markers=True,
+            title="Історія прогнозів"
+        )
+        fig.update_layout(
+            xaxis_title="Ітерація",
+            yaxis_title="Ймовірність відтоку (%)",
+            template="plotly_white"
+        )
+
+        return prediction_text, details, fig
+
     except Exception as e:
-        # Повернення дефолтних значень у разі помилки
-        return html.Div(f"Помилка при обробці даних: {str(e)}", style={"color": "red"}), ""
+        return html.Div(f"Помилка при обробці даних: {str(e)}", style={"color": "red"}), "", px.line(title="Історія прогнозів")
 
 
 if __name__ == "__main__":
     app.run_server(debug=True, host="0.0.0.0", port=8050)
-
