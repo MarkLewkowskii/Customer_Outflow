@@ -17,7 +17,7 @@ def preprocess_user_data(data: pd.DataFrame, medians_path: str, scaler_path: str
         medians = json.load(file)
 
     # Числові та категоріальні ознаки
-    numerical_columns = ['subscription_age', 'bill_avg', 'reamining_contract', 
+    numerical_columns = ['subscription_age', 'bill_avg', 'remaining_contract', 
                          'download_avg', 'upload_avg']
     categorical_columns = ['is_tv_subscriber', 'is_movie_package_subscriber', 
                            'service_failure_count', 'download_over_limit']

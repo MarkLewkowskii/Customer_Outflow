@@ -3,20 +3,25 @@ import joblib
 import os
 from data_preparation import preprocess_user_data
 from faker_new_client import generate_fake_client_data, generate_and_corrupt_data
-from src.graph_processing import ModelEvaluationVisualizer
-
-# Шлях до збереженої моделі
-model_path = os.path.join(os.getcwd(), 'models', 'model_RandomForest.joblib')
+from graph_processing import ModelEvaluationVisualizer
 
 # Отримуємо абсолютний шлях до кореневої директорії проекту
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.getcwd()
+
+# Шлях до збереженої моделі
+model_path = os.path.join(BASE_DIR, 'models', 'model_RandomForest.joblib')
+
+
 
 # Шляхи до файлів
-medians_path = os.path.join(BASE_DIR, "../data/processed/medians.json")
-scaler_path = os.path.join(BASE_DIR, "../data/processed/scaler.pkl")
-results_path = os.path.join(BASE_DIR, "../results", "model_evaluation.json")
+medians_path = os.path.join(BASE_DIR,'data/processed/', "medians.json")
+scaler_path = os.path.join(BASE_DIR, 'data/processed/', "scaler.pkl")
+results_path = os.path.join(BASE_DIR, "results", "model_evaluation.json")
 
-output_dir = os.path.join(BASE_DIR, "../results")
+
+output_dir = os.path.join(BASE_DIR, "results")
+
+# print(medians_path,scaler_path,results_path, output_dir)
 
 # перевірка наявності файла
 os.makedirs(output_dir, exist_ok=True)
@@ -28,11 +33,12 @@ for path in [model_path, medians_path, scaler_path]:
 
 # Очікувані стовпці
 EXPECTED_COLUMNS = [
-    "subscription_age", "bill_avg", "reamining_contract",
+    "subscription_age", "bill_avg", "remaining_contract",
     "download_avg", "upload_avg", "is_tv_subscriber",
     "is_movie_package_subscriber", "download_over_limit",
     "service_failure_count"
 ]
+
 
 def ensure_columns(data: pd.DataFrame, expected_columns: list) -> pd.DataFrame:
     """
@@ -41,6 +47,13 @@ def ensure_columns(data: pd.DataFrame, expected_columns: list) -> pd.DataFrame:
     for column in expected_columns:
         if column not in data.columns:
             data[column] = None  # Додати відсутній стовпець із значенням None
+
+    # Перетворення колонок на числовий тип, якщо можливо
+    for column in ["remaining_contract", "subscription_age", "bill_avg", "download_avg", "upload_avg",
+                   "service_failure_count"]:
+        if column in data.columns:
+            data[column] = pd.to_numeric(data[column], errors='coerce')  # Примусове перетворення
+
     return data[expected_columns]  # Гарантуємо порядок ознак
 
 def predict(data: pd.DataFrame) -> pd.DataFrame:
@@ -49,7 +62,7 @@ def predict(data: pd.DataFrame) -> pd.DataFrame:
     # Визначення очікуваного порядку колонок
     expected_order = [
         'is_tv_subscriber', 'is_movie_package_subscriber', 'subscription_age',
-        'bill_avg', 'reamining_contract', 'service_failure_count', 'download_avg',
+        'bill_avg', 'remaining_contract', 'service_failure_count', 'download_avg',
         'upload_avg', 'download_over_limit'
     ]
 
@@ -63,17 +76,13 @@ def predict(data: pd.DataFrame) -> pd.DataFrame:
     # Використання predict_proba для отримання ймовірностей
     probabilities = model.predict_proba(processed_data)
 
-    # Чому використовується predict_proba:
-    # predict_proba повертає ймовірності для кожного класу, що дозволяє оцінити,
-    # наскільки модель впевнена у своєму передбаченні. Зокрема, ми використовуємо
-    # ймовірність для класу "1" (відмова), щоб визначити шанс, що клієнт відмовиться.
-
     # Отримання ймовірностей для класу 1 (відмова) та конвертація у відсотки
     data['probability_of_churn'] = (probabilities[:, 1] * 100).round(2)
 
     # Додаємо колонку 'prediction'
     data['prediction'] = (probabilities[:, 1] > 0.5).astype(int)
     return data
+
 
 def run_visualization():
     try:
