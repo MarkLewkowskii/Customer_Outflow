@@ -1,31 +1,31 @@
-# Use Python 3.10-slim as a parent image
+# Використовуємо офіційний Python-образ
 FROM python:3.10-slim
 
-# Install system dependencies required by Poetry
+# Встановлюємо необхідні пакети Poetry
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
+# Встановлюємо Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="/root/.local/bin:$PATH"
 
-# Set the working directory in the container
+# Встановлюємо робочу директорію
 WORKDIR /app
 
-# Copy Poetry configuration files
+# Копіюємо файли конфігурації Poetry
 COPY pyproject.toml poetry.lock ./
 
-# Install dependencies
+# Встановлюємо залежності проекту
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
 
-# Copy the entire project into the container
+# Копіюємо решту файлів проекту
 COPY . .
 
-# Expose the port for the Dash app
+# Визначаємо порт для Dash
 EXPOSE 8050
 
-# Set the default command to run the Dash application
+# Вказуємо команду запуску evaluation.py
 CMD ["poetry", "run", "python", "src/evaluation.py"]
