@@ -1,11 +1,13 @@
 version: "3.8"
+
 services:
-  app:
+  dash-app:
     build:
-      context: .
+      context: ..
+      dockerfile: docker/dockerfile
     ports:
-      - "5000:5000" # Вказано для можливого розширення функціоналу
+      - "8050:8050"
     volumes:
-      - .:/app
+      - ../:/app
     environment:
-      - ENV=development
+      - DASH_DEBUG=true
