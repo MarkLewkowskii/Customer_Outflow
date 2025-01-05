@@ -5,6 +5,8 @@ import plotly.express as px
 from dash import Input, Output, State, html
 from joblib import load
 from faker_new_client import generate_fake_client_data
+from model_training import predict
+
 
 # Ініціалізація глобальних змінних
 all_predictions = []
@@ -159,12 +161,29 @@ def register_callbacks(app):
                 "download_over_limit": [int(over_limit)],
             })
 
+            # Виклик функції predict для обробки введених даних
+            result = predict(input_data)
+
             # Отримання прогнозу
-            prediction_value = model.predict(input_data)[0]
-            probability = model.predict_proba(input_data)[0][1] * 100
+            prediction_value = result['prediction'].iloc[0]
+            probability = result['probability_of_churn'].iloc[0]
+
+            # Категоризація ризику
+            risk_label, color = categorize_risk(probability)
 
             # Додавання тільки ймовірностей до all_predictions
             all_predictions.append(probability)
+
+            # Обчислення середнього ризику
+            average_churn = sum(all_predictions) / len(all_predictions)
+
+            # return (
+            #     risk_label,  # Текст ризику
+            #     {"color": color},  # Колір тексту ризику
+            #     f"{probability:.2f}%",  # Ймовірність відтоку
+            #     str(len(all_predictions)),  # Кількість прогнозів
+            #     f"{average_churn:.2f}%"  # Середня ймовірність відтоку
+            # )
 
         except Exception as e:
             print(f"Помилка при обробці даних: {e}")
@@ -306,44 +325,52 @@ def register_callbacks(app):
                 classification_report = metrics.get("classification_report", {})
                 abbreviated_name = abbreviations.get(model_name, model_name)
 
-                # Додавання метрик, лише якщо вони присутні
+                # Додавання accuracy
                 if "accuracy" in classification_report:
                     data.append({
                         "Model": abbreviated_name,
                         "Metric": "Accuracy",
                         "Value": classification_report["accuracy"]
                     })
+
+                # Додавання model size
                 if "model_size_mb" in metrics:
                     data.append({
                         "Model": abbreviated_name,
                         "Metric": "Model Size (MB)",
                         "Value": metrics["model_size_mb"]
                     })
+
+                # Додавання macro avg precision
                 if "macro avg" in classification_report:
                     macro_avg = classification_report["macro avg"]
                     data.append({
                         "Model": abbreviated_name,
-                        "Metric": "Precision",
+                        "Metric": "Macro Avg Precision",
                         "Value": macro_avg.get("precision", 0)
                     })
+
+                # Додавання weighted avg precision
+                if "weighted avg" in classification_report:
+                    weighted_avg = classification_report["weighted avg"]
                     data.append({
                         "Model": abbreviated_name,
-                        "Metric": "Recall",
-                        "Value": macro_avg.get("recall", 0)
+                        "Metric": "Weighted Avg Precision",
+                        "Value": weighted_avg.get("precision", 0)
                     })
 
-            # Перетворення у DataFrame
+                # Перетворення у DataFrame
             df = pd.DataFrame(data)
 
             # Побудова графіка
             fig = px.bar(
                 df,
-                x="Model",
+                x="Metric",
                 y="Value",
-                color="Metric",
+                color="Model",
                 barmode="group",
                 template="plotly_white",
-                labels={"Value": "Metric Value", "Model": "Models"}
+                labels={"Value": "Metric Value", "Metric": "Metrics"}
             )
 
             # Додавання підписів до барів
@@ -356,9 +383,9 @@ def register_callbacks(app):
             # Покращення дизайну
             fig.update_layout(
                 title_font=dict(size=20, family='Arial'),
-                xaxis_title="Models",
+                xaxis_title="Metrics",
                 yaxis_title="Metric Value",
-                legend_title="Metrics",
+                legend_title="Models",
                 xaxis_tickangle=-45,
                 bargap=0.15  # Відстань між групами барів
             )
@@ -366,30 +393,11 @@ def register_callbacks(app):
             return fig
 
         except FileNotFoundError as e:
-            # Логування помилки
             print(f"Файл не знайдено: {e}")
-            return px.bar(title="Файл результатів не знайдено.")
-
-        except json.JSONDecodeError as e:
-            # Помилка JSON
-            print(f"Помилка декодування JSON: {e}")
-            return px.bar(title="Помилка декодування JSON.")
-
+            return px.bar(title="Файл model_evaluation.json не знайдено")
         except Exception as e:
-            # Обробка інших винятків
-            print(f"Невідома помилка: {e}")
-            return px.bar(title=f"Невідома помилка: {e}")
-
-
-        except FileNotFoundError:
-            print(f"Файл {result_path} не знайдено.")
-            return px.bar(title="Файл результатів не знайдено.")
-        except json.JSONDecodeError as e:
-            print(f"Помилка декодування JSON: {e}")
-            return px.bar(title="Помилка декодування JSON")
-        except Exception as e:
-            print(f"Невідома помилка: {e}")
-            return px.bar(title=f"Помилка: {e}")
+            print(f"Помилка під час створення графіка: {e}")
+            return px.bar(title="Помилка під час створення графіка")
 
     # графік історії прогнозу
     @app.callback(
