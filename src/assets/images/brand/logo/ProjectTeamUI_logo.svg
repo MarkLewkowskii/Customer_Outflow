@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="160"
+   height="60"
+   viewBox="0 0 160 60"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.1 (9b9bdc1480, 2023-11-25, custom)"
+   sodipodi:docname="ProjectTeamUI_logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="3.3666667"
+     inkscape:cx="99.950495"
+     inkscape:cy="87.920792"
+     inkscape:window-width="1868"
+     inkscape:window-height="1011"
+     inkscape:window-x="52"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     shape-rendering="auto" />
+  <defs
+     id="defs1">
+    <rect
+       x="0.46083885"
+       y="21.702724"
+       width="118.85786"
+       height="53.609089"
+       id="rect1" />
+  </defs>
+  <g
+     inkscape:label="Шар 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       id="text1"
+       style="font-family:'Rubik Vinyl';-inkscape-font-specification:'Rubik Vinyl';white-space:pre;shape-inside:url(#rect1);display:inline;fill:#00529b" />
+    <text
+       xml:space="preserve"
+       style="font-size:48px;font-family:'Rubik Vinyl';-inkscape-font-specification:'Rubik Vinyl';fill:#624bff;fill-opacity:1;stroke-width:3.10551"
+       x="6.7876081"
+       y="38.655872"
+       id="text2"
+       transform="scale(0.74898485,1.3351405)"
+       inkscape:transform-center-x="17.794199"
+       inkscape:transform-center-y="1.5906517"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         x="6.7876081"
+         y="38.655872"
+         style="font-size:48px;fill:#624bff;fill-opacity:1;stroke-width:3.10551">PT2     UI</tspan></text>
+    <path
+       sodipodi:type="spiral"
+       style="fill:#ae0fff;fill-opacity:1;fill-rule:evenodd;stroke:#000000"
+       id="path2"
+       sodipodi:cx="92.214195"
+       sodipodi:cy="24.61311"
+       sodipodi:expansion="1"
+       sodipodi:revolution="3"
+       sodipodi:radius="23.404669"
+       sodipodi:argument="-20.789297"
+       sodipodi:t0="0"
+       d="m 92.214195,24.61311 c -0.423191,-1.094508 1.266587,-1.110445 1.819144,-0.703372 1.497396,1.103143 0.823565,3.348069 -0.4124,4.34166 -2.210853,1.777302 -5.424519,0.67859 -6.864176,-1.528173 -2.112755,-3.238513 -0.542046,-7.533737 2.643945,-9.386692 4.246426,-2.469698 9.655191,-0.409858 11.909212,3.759718 2.83645,5.246986 0.28008,11.782622 -4.875494,14.431724 -6.244086,3.208417 -13.913451,0.151723 -16.95424,-5.991263 -3.583465,-7.239297 -0.02427,-16.046402 7.107036,-19.476756 8.233369,-3.9604799 18.180768,0.102593 21.999268,8.222808 4.33883,9.226704 -0.22903,20.31613 -9.338578,24.521788 C 89.028378,47.522664 76.795697,42.449378 72.203609,32.350198 67.10552,21.138195 72.684696,7.7613552 83.773735,2.7833788"
+       transform="matrix(0.46138408,0,0,0.44648156,55.436412,18.719129)"
+       inkscape:label="path2" />
+  </g>
+</svg>
