@@ -25,6 +25,7 @@ RUN poetry install --no-root --only main
 COPY src/ ./src/
 COPY models/ ./models/
 COPY data/processed/ ./data/processed/
+COPY results/ ./results/  # Додано копіювання папки results
 
 # Додаємо шлях до PYTHONPATH
 ENV PYTHONPATH=/app:/app/src
