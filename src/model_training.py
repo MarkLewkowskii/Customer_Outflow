@@ -2,8 +2,8 @@ import pandas as pd
 import joblib
 import os
 from data_preparation import preprocess_user_data
-from faker_new_client import generate_fake_client_data, generate_and_corrupt_data
 from src.graph_processing import ModelEvaluationVisualizer
+
 
 # Шлях до збереженої моделі
 model_path = os.path.join(os.getcwd(), 'models', 'model_RandomForest.joblib')
@@ -12,7 +12,6 @@ model_path = os.path.join(os.getcwd(), 'models', 'model_RandomForest.joblib')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Шляхи до файлів
-medians_path = os.path.join(BASE_DIR, "../data/processed/medians.json")
 scaler_path = os.path.join(BASE_DIR, "../data/processed/scaler.pkl")
 results_path = os.path.join(BASE_DIR, "../results", "model_evaluation.json")
 
@@ -21,7 +20,7 @@ output_dir = os.path.join(BASE_DIR, "../results")
 # перевірка наявності файла
 os.makedirs(output_dir, exist_ok=True)
 
-for path in [model_path, medians_path, scaler_path]:
+for path in [model_path, scaler_path]:
     if not os.path.exists(path):
         raise FileNotFoundError(f"Файл не знайдено: {path}")
 
@@ -55,7 +54,7 @@ def predict(data: pd.DataFrame) -> pd.DataFrame:
 
     # Гарантуємо наявність і правильний порядок колонок
     data = ensure_columns(data, expected_order)
-    processed_data = preprocess_user_data(data, medians_path, scaler_path)
+    processed_data = preprocess_user_data(data, scaler_path)
 
     # Перевірка порядку колонок після обробки
     processed_data = processed_data[expected_order]
@@ -87,21 +86,4 @@ def run_visualization():
 
 if __name__ == "__main__":
     print("Розпочато навчання моделей...")
-
-    # Генерація даних для нового клієнта
-    fake_client_data = generate_fake_client_data()
-    user_data = pd.DataFrame([fake_client_data])
-
-    # Передбачення
-    result = predict(user_data)
-    print("Результати з повних даних:", result)
-
-    # Генерація неповних даних, для перевірки як модель справляється з обробкою
-    corrupt_client_data = generate_and_corrupt_data()
-    corrupt_user_data = pd.DataFrame([corrupt_client_data])
-
-    # Передбачення
-    result = predict(corrupt_user_data)
-    print("Результати з неповних даних:", result)
-
     run_visualization()
