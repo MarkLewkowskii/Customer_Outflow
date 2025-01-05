@@ -270,8 +270,8 @@ def register_callbacks(app):
     )
     def update_model_chart(n_clicks):
         # Завантаження даних з JSON
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = get_root_path('../results/model_evaluation.json')
+        file_path = os.path.join(get_root_path(), 'results', 'model_evaluation.json')
+
 
         with open(file_path) as f:
             model_data = json.load(f)
