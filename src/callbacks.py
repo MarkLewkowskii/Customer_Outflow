@@ -26,15 +26,16 @@ def get_model_path(model_name="RandomForest"):
         raise FileNotFoundError(f"Файл моделі {model_path} не знайдено.")
     return model_path
 
-def get_results_path():
+def get_results_path(filename="model_evaluation.json"):
     """
     Функція для отримання шляху до файлу результатів.
     """
     root_path = get_root_path()
-    results_path = os.path.join(root_path, "results", "model_evaluation.json")
+    results_path = os.path.join(root_path, "results", filename)
     if not os.path.exists(results_path):
         raise FileNotFoundError(f"Файл результатів {results_path} не знайдено.")
     return results_path
+
 
 
 def load_model(model_name="RandomForest"):
