@@ -21,11 +21,8 @@ COPY pyproject.toml poetry.lock ./
 # Встановлюємо залежності проекту
 RUN poetry install --no-root --only main
 
-# Копіюємо решту файлів проекту
-COPY src/ ./src/
-COPY models/ ./models/
-COPY data/processed/ ./data/processed/
-# COPY results/ ./src/results/  # Додано копіювання папки results
+# Копіюємо весь проєкт
+COPY . .
 
 # Додаємо шлях до PYTHONPATH
 ENV PYTHONPATH=/app:/app/src
