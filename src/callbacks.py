@@ -20,10 +20,22 @@ def get_model_path(model_name="RandomForest"):
     Функція для отримання шляху до моделі.
     """
     root_path = get_root_path()
+    results_path =os.path.join(root_path, "results", 'model_evaluation.json')
     model_path = os.path.join(root_path, "models", f"model_{model_name}.joblib")
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Файл моделі {model_path} не знайдено.")
     return model_path
+
+def get_results_path():
+    """
+    Функція для отримання шляху до файлу результатів.
+    """
+    root_path = get_root_path()
+    results_path = os.path.join(root_path, "results", "model_evaluation.json")
+    if not os.path.exists(results_path):
+        raise FileNotFoundError(f"Файл результатів {results_path} не знайдено.")
+    return results_path
+
 
 def load_model(model_name="RandomForest"):
     """
@@ -269,78 +281,102 @@ def register_callbacks(app):
         Input("predict-button", "n_clicks")
     )
     def update_model_chart(n_clicks):
-        # Завантаження даних з JSON
-        file_path = os.path.join('results', 'model_evaluation.json')
+        try:
+            # Завантаження даних з JSON
+            result_path = get_results_path("model_evaluation.json")
 
+            if not os.path.exists(result_path):
+                print(f"Файл {result_path} не знайдено.")
+                return px.bar(title="Файл результатів не знайдено.")
 
+            with open(result_path) as f:
+                model_data = json.load(f)
 
-        with open(file_path) as f:
-            model_data = json.load(f)
+            print("JSON дані успішно завантажені:", model_data)
 
-        # Структурування даних
-        data = []
+            # Структурування даних
+            data = []
 
-        # Абревіатури для моделей
-        abbreviations = {
-            "Histogram-based Gradient Boosting Classification Tree": "HGBCT",
-            "Random Forest": "RF",
-            "Gradient Boosting": "GB",
-            "Logistic Regression": "LR"
-        }
+            # Абревіатури для моделей
+            abbreviations = {
+                "Histogram-based Gradient Boosting Classification Tree": "HGBCT",
+                "Random Forest": "RF",
+                "Gradient Boosting": "GB",
+                "Logistic Regression": "LR"
+            }
 
-        for model_name, metrics in model_data.items():
-            classification_report = metrics["classification_report"]
-            # Використовуємо абревіатуру моделі
-            abbreviated_name = abbreviations.get(model_name, model_name)
-            data.append({
-                "Model": abbreviated_name,
-                "Metric": "Accuracy",
-                "Value": classification_report["accuracy"]
-            })
-            data.append({
-                "Model": abbreviated_name,
-                "Metric": "Model Size (MB)",
-                "Value": metrics["model_size_mb"]
-            })
-            data.append({
-                "Model": abbreviated_name,
-                "Metric": "Precision",
-                "Value": classification_report["macro avg"]["precision"]
-            })
-            data.append({
-                "Model": abbreviated_name,
-                "Metric": "Recall",
-                "Value": classification_report["macro avg"]["recall"]
-            })
+            for model_name, metrics in model_data.items():
+                classification_report = metrics.get("classification_report", {})
+                abbreviated_name = abbreviations.get(model_name, model_name)
 
-        df = pd.DataFrame(data)
+                # Додавання метрик, лише якщо вони присутні
+                if "accuracy" in classification_report:
+                    data.append({
+                        "Model": abbreviated_name,
+                        "Metric": "Accuracy",
+                        "Value": classification_report["accuracy"]
+                    })
+                if "model_size_mb" in metrics:
+                    data.append({
+                        "Model": abbreviated_name,
+                        "Metric": "Model Size (MB)",
+                        "Value": metrics["model_size_mb"]
+                    })
+                if "macro avg" in classification_report:
+                    macro_avg = classification_report["macro avg"]
+                    data.append({
+                        "Model": abbreviated_name,
+                        "Metric": "Precision",
+                        "Value": macro_avg.get("precision", 0)
+                    })
+                    data.append({
+                        "Model": abbreviated_name,
+                        "Metric": "Recall",
+                        "Value": macro_avg.get("recall", 0)
+                    })
 
-        # Побудова графіка
-        fig = px.bar(
-            df,
-            x="Model",
-            y="Value",
-            color="Metric",
-            barmode="group",
-            template="plotly_white",
-            labels={"Value": "Metric Value", "Model": "Models"}
-        )
+            # Перетворення у DataFrame
+            df = pd.DataFrame(data)
 
-        # Додавання підписів до барів
-        fig.update_traces(text=df["Value"].round(3), textposition='outside')
+            # Побудова графіка
+            fig = px.bar(
+                df,
+                x="Model",
+                y="Value",
+                color="Metric",
+                barmode="group",
+                template="plotly_white",
+                labels={"Value": "Metric Value", "Model": "Models"}
+            )
 
-        # Покращення дизайну
-        fig.update_layout(
-            title_font=dict(size=20, family='Arial'),
-            xaxis_title="Models",
-            yaxis_title="Metric Value",
-            legend_title="Metrics",
-            xaxis_tickangle=-45,
-            bargap=0.15  # Відстань між групами барів
-        )
+            # Додавання підписів до барів
+            fig.update_traces(
+                text=df["Value"].round(3),
+                textposition='outside',
+                marker=dict(line=dict(width=1.5, color='black'))
+            )
 
-        # Показати графік
-        return fig
+            # Покращення дизайну
+            fig.update_layout(
+                title_font=dict(size=20, family='Arial'),
+                xaxis_title="Models",
+                yaxis_title="Metric Value",
+                legend_title="Metrics",
+                xaxis_tickangle=-45,
+                bargap=0.15  # Відстань між групами барів
+            )
+
+            return fig
+
+        except FileNotFoundError:
+            print(f"Файл {result_path} не знайдено.")
+            return px.bar(title="Файл результатів не знайдено.")
+        except json.JSONDecodeError as e:
+            print(f"Помилка декодування JSON: {e}")
+            return px.bar(title="Помилка декодування JSON")
+        except Exception as e:
+            print(f"Невідома помилка: {e}")
+            return px.bar(title=f"Помилка: {e}")
 
     # графік історії прогнозу
     @app.callback(
