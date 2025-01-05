@@ -4,7 +4,7 @@ import pandas as pd
 from dash import Input, Output, State, html
 from joblib import load
 import plotly.express as px
-from faker_new_client import generate_fake_client_data
+from src.faker_new_client import generate_fake_client_data
 
 # Ініціалізація глобальних змінних
 all_predictions = []
