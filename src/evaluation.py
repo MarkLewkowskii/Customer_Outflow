@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 from dash import Dash, dcc, html, Input, Output, State
 from faker_new_client import generate_fake_client_data
+from model_training import predict
 
 # Підключення Bootstrap через CDN
 app = Dash(__name__, external_stylesheets=[
@@ -269,11 +270,6 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
         return "Будь ласка, заповніть усі поля", "", px.line(title="Історія прогнозів")
 
     try:
-        # Завантаження моделі
-        from joblib import load
-        model_path = 'models/model_RandomForest.joblib'  # Оригінальний шлях
-        model = load(model_path)
-
         # Створення DataFrame з введених даних
         input_data = pd.DataFrame({
             'is_tv_subscriber': [int(is_tv)],
@@ -287,9 +283,12 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
             'download_over_limit': [int(over_limit)]
         })
 
-        # Отримання прогнозу
-        prediction_value = model.predict(input_data)[0]
-        probability = model.predict_proba(input_data)[0][1] * 100
+        # Використання функції predict для отримання прогнозу
+        prediction_result = predict(input_data)
+
+        # Отримання результатів
+        prediction_value = prediction_result['prediction'][0]
+        probability = prediction_result['probability_of_churn'][0]
 
         all_predictions.append({
             "Ймовірність відтоку (%)": probability,
