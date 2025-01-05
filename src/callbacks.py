@@ -1,9 +1,9 @@
 import os
 import json
 import pandas as pd
+import plotly.express as px
 from dash import Input, Output, State, html
 from joblib import load
-import plotly.express as px
 from src.faker_new_client import generate_fake_client_data
 
 # Ініціалізація глобальних змінних

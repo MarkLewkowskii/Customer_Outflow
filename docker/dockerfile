@@ -26,11 +26,11 @@ COPY src/ ./src/
 COPY models/ ./models/
 COPY data/processed/ ./data/processed/
 
+# Додаємо шлях до PYTHONPATH
+ENV PYTHONPATH=/app:/app/src
+
 # Визначаємо порт для Dash
 EXPOSE 8050
-
-# # Додаємо шлях до PYTHONPATH
-# ENV PYTHONPATH=/app:/app/src
 
 # Вказуємо команду запуску evaluation.py
 CMD ["poetry", "run", "python", "src/evaluation.py"]
