@@ -286,10 +286,6 @@ def register_callbacks(app):
             # Завантаження даних з JSON
             result_path = get_results_path("model_evaluation.json")
 
-            if not os.path.exists(result_path):
-                print(f"Файл {result_path} не знайдено.")
-                return px.bar(title="Файл результатів не знайдено.")
-
             with open(result_path) as f:
                 model_data = json.load(f)
 
@@ -368,6 +364,22 @@ def register_callbacks(app):
             )
 
             return fig
+
+        except FileNotFoundError as e:
+            # Логування помилки
+            print(f"Файл не знайдено: {e}")
+            return px.bar(title="Файл результатів не знайдено.")
+
+        except json.JSONDecodeError as e:
+            # Помилка JSON
+            print(f"Помилка декодування JSON: {e}")
+            return px.bar(title="Помилка декодування JSON.")
+
+        except Exception as e:
+            # Обробка інших винятків
+            print(f"Невідома помилка: {e}")
+            return px.bar(title=f"Невідома помилка: {e}")
+
 
         except FileNotFoundError:
             print(f"Файл {result_path} не знайдено.")
