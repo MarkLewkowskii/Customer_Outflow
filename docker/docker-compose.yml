@@ -4,7 +4,7 @@ services:
     build:
       context: .
     ports:
-      - "8050:8050" # Dash працює на порту 8050
+      - "5000:5000" # Dash працює на порту 8050
     volumes:
       - .:/app
     environment:
