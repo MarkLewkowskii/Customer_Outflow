@@ -49,12 +49,26 @@ def model_size(model_path):
 
 # Функція для збереження даних у JSON-файл
 def save_results_to_json(model_name, classification_report, model_size):
-    # Перевіряємо, чи файл вже існує
-    if os.path.exists(results_path):
+    if os.path.exists(results_path) and os.path.getsize(results_path) > 0:
         with open(results_path, "r") as f:
-            results = json.load(f)
+            try:
+                results = json.load(f)
+            except json.JSONDecodeError:
+                print("Файл JSON пошкоджений. Створюємо новий.")
+                results = {}
     else:
         results = {}
+
+    # Додаємо нові дані
+    results[model_name] = {
+        "classification_report": classification_report,
+        "model_size_mb": model_size,
+    }
+
+    # Зберігаємо результати у JSON
+    with open(results_path, "w") as f:
+        json.dump(results, f, indent=4)
+
 
     # Додаємо дані для поточної моделі
     results[model_name] = {
@@ -186,13 +200,10 @@ def model_classification_report(model, model_name, X_test, y_test):
     """
     # Генерація прогнозів
     y_pred = model.predict(X_test)
-
     # Генерація класифікаційного звіту
     report = classification_report(y_test, y_pred, output_dict=True)
-
     # Визначення розміру моделі
     model_size_mb = model_size(MODEL_PATHS[model_name]) / (1024 * 1024)  # Конвертуємо байти в MB
-
     # Збереження результатів у JSON
     save_results_to_json(model_name, report, model_size_mb)
 
