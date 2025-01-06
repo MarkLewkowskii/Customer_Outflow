@@ -32,10 +32,10 @@ def get_results_path(filename="model_evaluation.json"):
     """
     Функція для отримання шляху до файлу результатів.
     """
-    root_path = get_root_path()
+    root_path = os.getcwd()  # Замість get_root_path()
     results_path = os.path.join(root_path, "results", filename)
     if not os.path.exists(results_path):
-        raise FileNotFoundError(f"Файл результатів {results_path} не знайдено.")
+        raise FileNotFoundError(f"Файл {results_path} не знайдено. Перевірте шлях.")
     return results_path
 
 
@@ -47,7 +47,7 @@ def load_model(model_name="RandomForest"):
     model_path = get_model_path(model_name)
     return load(model_path)
 
-def standardize_input_data(data):
+def standardize_and_predict(data, model_path):
     """
     Функція для стандартизації введених даних.
     """
@@ -63,7 +63,7 @@ def standardize_input_data(data):
             'upload_avg': [float(data.get("upload_avg", 0))],
             'download_over_limit': [int(data.get("download_over_limit", 0))]
         })
-        return standardized_data
+        return predict(standardized_data, model_path)
     except Exception as e:
         raise ValueError(f"Помилка при стандартизації даних: {e}")
 
@@ -162,7 +162,7 @@ def register_callbacks(app):
             })
 
             # Виклик функції predict для обробки введених даних
-            result = predict(input_data)
+            result = standardize_and_predict(input_data)
 
             # Отримання прогнозу
             prediction_value = result['prediction'].iloc[0]

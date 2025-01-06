@@ -9,10 +9,9 @@ class ModelEvaluationVisualizer:
     Модуль для візуалізації данних на основі основних результатів навчальних моделій. Цей модуль будує порівняльні графіки.
     """
 
-    def __init__(self, base_dir):
-        self.base_dir = base_dir
-        self.results_dir = os.path.join(self.base_dir, "results")
-        self.json_file_path = os.path.join(self.results_dir, "model_evaluation.json")
+    def __init__(self, base_dir, results_dir="results", json_filename="model_evaluation.json"):
+        self.results_dir = os.path.join(base_dir, results_dir)
+        self.json_file_path = os.path.join(self.results_dir, json_filename)
 
         # Перевіряємо, чи файл існує
         if not os.path.exists(self.json_file_path):
