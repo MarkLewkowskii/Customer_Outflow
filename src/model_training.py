@@ -1,5 +1,5 @@
 import pandas as pd
-import joblib
+from joblib import load
 import os
 from data_preparation import preprocess_user_data
 from src.graph_processing import ModelEvaluationVisualizer
@@ -33,46 +33,53 @@ EXPECTED_COLUMNS = [
     "service_failure_count"
 ]
 
-def ensure_columns(data: pd.DataFrame, expected_columns: list) -> pd.DataFrame:
+def ensure_columns(df):
     """
-    Гарантує, що всі очікувані стовпці присутні та розташовані в правильному порядку.
+    Ensure the DataFrame has the correct columns.
     """
-    for column in expected_columns:
-        if column not in data.columns:
-            data[column] = None  # Додати відсутній стовпець із значенням None
-    return data[expected_columns]  # Гарантуємо порядок ознак
-
-def predict(data: pd.DataFrame) -> pd.DataFrame:
-    model = joblib.load(model_path)
-
-    # Визначення очікуваного порядку колонок
-    expected_order = [
+    required_columns = [
         'is_tv_subscriber', 'is_movie_package_subscriber', 'subscription_age',
-        'bill_avg', 'reamining_contract', 'service_failure_count', 'download_avg',
-        'upload_avg', 'download_over_limit'
+        'bill_avg', 'reamining_contract', 'service_failure_count',
+        'download_avg', 'upload_avg', 'download_over_limit'
     ]
+    for col in required_columns:
+        if col not in df.columns:
+            df[col] = 0
+    return df[required_columns]
 
-    # Гарантуємо наявність і правильний порядок колонок
-    data = ensure_columns(data, expected_order)
+def load_model(model_name):
+    """
+    Load the model based on the provided model name.
+    """
+    model_path = f"models/model_{model_name}.joblib"
+    return load(model_path)
+
+def predict(data: pd.DataFrame, model_name: str = "RandomForest") -> pd.DataFrame:
+    """
+    Прогнозує ймовірність відтоку для клієнтів, використовуючи вказану модель.
+
+    :param data: DataFrame із вхідними даними.
+    :param model_name: Назва моделі для завантаження.
+    :return: DataFrame із прогнозами та ймовірностями.
+    """
+    # Завантаження моделі
+    model = load_model(model_name)
+
+    # Гарантуємо наявність правильних колонок
+    data = ensure_columns(data)
+
+    # Попередня обробка даних
     processed_data = preprocess_user_data(data, scaler_path)
-
-    # Перевірка порядку колонок після обробки
-    processed_data = processed_data[expected_order]
 
     # Використання predict_proba для отримання ймовірностей
     probabilities = model.predict_proba(processed_data)
 
-    # Чому використовується predict_proba:
-    # predict_proba повертає ймовірності для кожного класу, що дозволяє оцінити,
-    # наскільки модель впевнена у своєму передбаченні. Зокрема, ми використовуємо
-    # ймовірність для класу "1" (відмова), щоб визначити шанс, що клієнт відмовиться.
-
-    # Отримання ймовірностей для класу 1 (відмова) та конвертація у відсотки
+    # Додавання результатів у DataFrame
     data['probability_of_churn'] = (probabilities[:, 1] * 100).round(2)
-
-    # Додаємо колонку 'prediction'
     data['prediction'] = (probabilities[:, 1] > 0.5).astype(int)
+
     return data
+
 
 def run_visualization():
     try:

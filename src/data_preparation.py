@@ -18,4 +18,3 @@ def preprocess_user_data(data: pd.DataFrame, scaler_path: str) -> pd.DataFrame:
     data[numerical_columns] = scaler.transform(data[numerical_columns])
 
     return data
-
