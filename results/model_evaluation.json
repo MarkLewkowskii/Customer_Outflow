@@ -1,153 +1,33 @@
 {
-    "RandomForest": {
-        "classification_report": {
-            "0": {
-                "precision": 0.9265123226288274,
-                "recall": 0.9465893483900504,
-                "f1-score": 0.9364432367149759,
-                "support": 6553.0
-            },
-            "1": {
-                "precision": 0.9548969072164949,
-                "recall": 0.9377372817008353,
-                "f1-score": 0.9462393053249905,
-                "support": 7902.0
-            },
-            "accuracy": 0.9417502594258043,
-            "macro avg": {
-                "precision": 0.9407046149226612,
-                "recall": 0.9421633150454428,
-                "f1-score": 0.9413412710199831,
-                "support": 14455.0
-            },
-            "weighted avg": {
-                "precision": 0.9420290979599757,
-                "recall": 0.9417502594258043,
-                "f1-score": 0.9417983757088421,
-                "support": 14455.0
-            }
-        },
-        "model_size_mb": 59.79587650299072
-    },
-    "GradientBoosting": {
-        "classification_report": {
-            "0": {
-                "precision": 0.9219475655430711,
-                "recall": 0.9391118571646574,
-                "f1-score": 0.9304505594194133,
-                "support": 6553.0
-            },
-            "1": {
-                "precision": 0.9487146529562982,
-                "recall": 0.934067324727917,
-                "f1-score": 0.9413340135186838,
-                "support": 7902.0
-            },
-            "accuracy": 0.9363542026980284,
-            "macro avg": {
-                "precision": 0.9353311092496847,
-                "recall": 0.9365895909462871,
-                "f1-score": 0.9358922864690487,
-                "support": 14455.0
-            },
-            "weighted avg": {
-                "precision": 0.9365801165454455,
-                "recall": 0.9363542026980284,
-                "f1-score": 0.9364001307990354,
-                "support": 14455.0
-            }
-        },
-        "model_size_mb": 0.18362140655517578
-    },
-    "HistGradientBoosting": {
-        "classification_report": {
-            "0": {
-                "precision": 0.9292580354460799,
-                "recall": 0.944147718602167,
-                "f1-score": 0.9366437060025736,
-                "support": 6553.0
-            },
-            "1": {
-                "precision": 0.9530588687956907,
-                "recall": 0.9403948367501899,
-                "f1-score": 0.9466845021975921,
-                "support": 7902.0
-            },
-            "accuracy": 0.9420961604980975,
-            "macro avg": {
-                "precision": 0.9411584521208853,
-                "recall": 0.9422712776761784,
-                "f1-score": 0.9416641041000828,
-                "support": 14455.0
-            },
-            "weighted avg": {
-                "precision": 0.9422690479074168,
-                "recall": 0.9420961604980975,
-                "f1-score": 0.9421326282808881,
-                "support": 14455.0
-            }
-        },
-        "model_size_mb": 0.35753631591796875
-    },
-    "LogisticRegression": {
-        "classification_report": {
-            "0": {
-                "precision": 0.8514150943396226,
-                "recall": 0.7712498092476728,
-                "f1-score": 0.8093522299623669,
-                "support": 6553.0
-            },
-            "1": {
-                "precision": 0.8240403803263294,
-                "recall": 0.8883826879271071,
-                "f1-score": 0.8550027403933987,
-                "support": 7902.0
-            },
-            "accuracy": 0.8352819093739191,
-            "macro avg": {
-                "precision": 0.837727737332976,
-                "recall": 0.8298162485873899,
-                "f1-score": 0.8321774851778828,
-                "support": 14455.0
-            },
-            "weighted avg": {
-                "precision": 0.8364503769315949,
-                "recall": 0.8352819093739191,
-                "f1-score": 0.8343076317905241,
-                "support": 14455.0
-            }
-        },
-        "model_size_mb": 0.0013875961303710938
-    },
     "Random Forest": {
         "classification_report": {
             "0": {
-                "precision": 0.9765171102661597,
-                "recall": 0.9962450347567031,
-                "f1-score": 0.9862824313737538,
+                "precision": 0.976581508515815,
+                "recall": 0.9964622641509434,
+                "f1-score": 0.9864217252396166,
                 "support": 32224.0
             },
             "1": {
-                "precision": 0.9969288560623366,
-                "recall": 0.9807240948813982,
-                "f1-score": 0.9887600850860301,
+                "precision": 0.997106158298218,
+                "recall": 0.9807740324594257,
+                "f1-score": 0.9888726650219022,
                 "support": 40050.0
             },
-            "accuracy": 0.9876442427428951,
+            "accuracy": 0.9877687688518693,
             "macro avg": {
-                "precision": 0.9867229831642481,
-                "recall": 0.9884845648190507,
-                "f1-score": 0.987521258229892,
+                "precision": 0.9868438334070165,
+                "recall": 0.9886181483051846,
+                "f1-score": 0.9876471951307594,
                 "support": 72274.0
             },
             "weighted avg": {
-                "precision": 0.9878280992682473,
-                "recall": 0.9876442427428951,
-                "f1-score": 0.9876554013377336,
+                "precision": 0.9879550622666139,
+                "recall": 0.9877687688518693,
+                "f1-score": 0.9877798919147768,
                 "support": 72274.0
             }
         },
-        "model_size_mb": 34.00393009185791
+        "model_size_mb": 34.038872718811035
     },
     "Histogram-based Gradient Boosting Classification Tree": {
         "classification_report": {
@@ -207,7 +87,7 @@
                 "support": 72274.0
             }
         },
-        "model_size_mb": 0.8839235305786133
+        "model_size_mb": 0.8838624954223633
     },
     "Logistic Regression": {
         "classification_report": {

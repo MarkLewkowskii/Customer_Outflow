@@ -1,16 +1,17 @@
 import json
 import matplotlib.pyplot as plt
 import os
-
+from shared import EVALUATION_RESULTS_PATH, RESULTS_DIR
 
 
 class ModelEvaluationVisualizer:
     """
-    Модуль для візуалізації данних на основі основних результатів навчальних моделій. Цей модуль будує порівняльні графіки.
+    Модуль для візуалізації даних на основі основних результатів навчальних моделей.
+    Цей модуль будує порівняльні графіки.
     """
 
-    def __init__(self, base_dir, results_dir="results", json_filename="model_evaluation.json"):
-        self.results_dir = os.path.join(base_dir, results_dir)
+    def __init__(self, base_dir=RESULTS_DIR, json_filename="model_evaluation.json"):
+        self.results_dir = base_dir
         self.json_file_path = os.path.join(self.results_dir, json_filename)
 
         # Перевіряємо, чи файл існує
@@ -25,6 +26,9 @@ class ModelEvaluationVisualizer:
             self.data = json.load(f)
 
     def parse_data(self):
+        """
+        Витягує дані з JSON для побудови графіків.
+        """
         model_names = []
         accuracies = []
         f1_scores = []
@@ -34,12 +38,15 @@ class ModelEvaluationVisualizer:
         for model_name, model_data in self.data.items():
             model_names.append(model_name)
             accuracies.append(model_data["classification_report"]["accuracy"] * 100)  # Точність у відсотках
-            f1_scores.append(model_data["classification_report"]["macro avg"]["f1-score"] * 100)  # F1-метрика
+            f1_scores.append(model_data["classification_report"]["weighted avg"]["f1-score"] * 100)  # F1-метрика
             model_sizes.append(model_data["model_size_mb"])  # Розмір моделі в MB
 
         return model_names, accuracies, f1_scores, model_sizes
 
     def create_plots(self):
+        """
+        Створює та зберігає графіки для оцінки моделей.
+        """
         model_names, accuracies, f1_scores, model_sizes = self.parse_data()
 
         # Побудова графіку точності
@@ -78,10 +85,21 @@ class ModelEvaluationVisualizer:
         print("Графіки успішно збережені в папці results.")
 
 
-if __name__ == "__main__":
-    # Отримуємо абсолютний шлях до кореневої директорії проекту
-    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+def run_visualization(base_dir):
+    """
+    Функція для запуску візуалізації результатів.
+    """
+    try:
+        visualizer = ModelEvaluationVisualizer()
+        visualizer.create_plots()
+        print("Графіки успішно створені та збережені!")
+    except FileNotFoundError as e:
+        print(f"Помилка під час візуалізації: {e}")
+    except Exception as e:
+        print(f"Невідома помилка: {e}")
 
-    # Створюємо візуалізатор
-    visualizer = ModelEvaluationVisualizer(BASE_DIR)
-    visualizer.create_plots()
+
+if __name__ == "__main__":
+
+    # Запуск візуалізації
+    run_visualization(EVALUATION_RESULTS_PATH)
