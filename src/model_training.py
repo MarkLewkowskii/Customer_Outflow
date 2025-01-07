@@ -4,42 +4,32 @@ import os
 from data_preparation import preprocess_user_data
 from src.graph_processing import ModelEvaluationVisualizer
 
-
-# Шлях до збереженої моделі
-model_path = os.path.join(os.getcwd(), 'models', 'model_RandomForest.joblib')
-
 # Отримуємо абсолютний шлях до кореневої директорії проекту
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(BASE_DIR)
+
 
 # Шляхи до файлів
-scaler_path = os.path.join(BASE_DIR, "../data/processed/scaler.pkl")
-results_path = os.path.join(BASE_DIR, "../results", "model_evaluation.json")
-
-output_dir = os.path.join(BASE_DIR, "../results")
+scaler_path = os.path.join(BASE_DIR, "./data/processed/scaler.pkl")
+results_path = os.path.join(BASE_DIR, "./results", "model_evaluation.json")
+output_dir = os.path.join(BASE_DIR, "./results")
 
 # перевірка наявності файла
 os.makedirs(output_dir, exist_ok=True)
 
-for path in [model_path, scaler_path]:
+for path in [scaler_path]:
     if not os.path.exists(path):
         raise FileNotFoundError(f"Файл не знайдено: {path}")
 
-
-# Очікувані стовпці
-EXPECTED_COLUMNS = [
-    "subscription_age", "bill_avg", "reamining_contract",
-    "download_avg", "upload_avg", "is_tv_subscriber",
-    "is_movie_package_subscriber", "download_over_limit",
-    "service_failure_count"
-]
-
 def ensure_columns(df):
     """
-    Ensure the DataFrame has the correct columns.
+    Перевіряємо, що DataFrame має правильні колонки.
     """
     required_columns = [
         'is_tv_subscriber', 'is_movie_package_subscriber', 'subscription_age',
-        'bill_avg', 'reamining_contract', 'service_failure_count',
+        'bill_avg', 'remaining_contract', 'service_failure_count',
         'download_avg', 'upload_avg', 'download_over_limit'
     ]
     for col in required_columns:
@@ -48,13 +38,13 @@ def ensure_columns(df):
     return df[required_columns]
 
 def load_model(model_name):
-    """
-    Load the model based on the provided model name.
-    """
-    model_path = f"models/model_{model_name}.joblib"
+    model_path = os.path.join(BASE_DIR, f"./models/model_{model_name}.joblib")
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Модель {model_name} не знайдена за шляхом {model_path}")
     return load(model_path)
 
-def predict(data: pd.DataFrame, model_name: str = "RandomForest") -> pd.DataFrame:
+
+def predict(data: pd.DataFrame, model_name: str = "model_HistGradientBoosting.joblib") -> pd.DataFrame:
     """
     Прогнозує ймовірність відтоку для клієнтів, використовуючи вказану модель.
 
@@ -79,7 +69,6 @@ def predict(data: pd.DataFrame, model_name: str = "RandomForest") -> pd.DataFram
     data['prediction'] = (probabilities[:, 1] > 0.5).astype(int)
 
     return data
-
 
 def run_visualization():
     try:
