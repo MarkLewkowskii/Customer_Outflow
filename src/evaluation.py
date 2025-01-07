@@ -3,6 +3,9 @@ import plotly.express as px
 from dash import Dash, dcc, html, Input, Output, State
 from faker_new_client import generate_fake_client_data
 from model_training import predict
+import os
+from joblib import load
+
 
 # Підключення Bootstrap через CDN
 app = Dash(__name__, external_stylesheets=[
@@ -143,6 +146,22 @@ app.layout = html.Div([
                             className="form-select"
                         )
                     ]),
+                    html.Div(className="mb-3", children=[
+                        html.Label("Виберіть модель для прогнозування", className="form-label"),
+                        dcc.Dropdown(
+                            id="model-selector",
+                            options=[
+                                {"label": "Random Forest", "value": "RandomForest"},
+                                {"label": "Gradient Boosting", "value": "GradientBoosting"},
+                                {"label": "Hist Gradient Boosting (рекомендована)", "value": "HistGradientBoosting"},
+                                {"label": "Logistic Regression", "value": "LogisticRegression"}
+                            ],
+                            value="HistGradientBoosting",  # Рекомендована модель за замовчуванням
+                            placeholder="Оберіть модель",
+                            className="form-select"
+                        )
+                    ]),
+
                     html.Div(className="d-grid gap-2", children=[
                         html.Button(
                             "Зробити прогноз",
@@ -225,11 +244,11 @@ app.layout = html.Div([
 def fill_random_data(n_clicks):
     if n_clicks is None:
         return [None] * 9  # Початкове значення
-    fake_data = generate_fake_client_data()
+    fake_data = generate_fake_client_data(high_risk_probability=0.7)
     return [
         fake_data["subscription_age"],
         fake_data["bill_avg"],
-        fake_data["reamining_contract"],
+        fake_data["remaining_contract"],
         fake_data["download_avg"],
         fake_data["upload_avg"],
         fake_data["service_failure_count"],
@@ -252,12 +271,13 @@ def fill_random_data(n_clicks):
      State("service-failure-count", "value"),
      State("is-tv-subscriber", "value"),
      State("is-movie-package", "value"),
-     State("download-over-limit", "value")]
+     State("download-over-limit", "value"),
+     State("model-selector", "value")]
 )
 
 def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
                     download_avg, upload_avg, service_failure_count,
-                    is_tv, is_movie, over_limit):
+                    is_tv, is_movie, over_limit, model_name):
     global all_predictions
 
     if n_clicks is None:
@@ -276,7 +296,7 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
             'is_movie_package_subscriber': [int(is_movie)],
             'subscription_age': [float(subscription_age)],
             'bill_avg': [float(bill_avg)],
-            'reamining_contract': [float(remaining_contract)],
+            'remaining_contract': [float(remaining_contract)],
             'service_failure_count': [int(service_failure_count)],
             'download_avg': [float(download_avg)],
             'upload_avg': [float(upload_avg)],
@@ -284,7 +304,8 @@ def make_prediction(n_clicks, subscription_age, bill_avg, remaining_contract,
         })
 
         # Використання функції predict для отримання прогнозу
-        prediction_result = predict(input_data)
+        prediction_result = predict(input_data, model_name=model_name)
+
 
         # Отримання результатів
         prediction_value = prediction_result['prediction'][0]

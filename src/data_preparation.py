@@ -10,7 +10,7 @@ def preprocess_user_data(data: pd.DataFrame, scaler_path: str) -> pd.DataFrame:
     :return: Оброблений DataFrame.
     """
     # Числові та категоріальні ознаки
-    numerical_columns = ['subscription_age', 'bill_avg', 'reamining_contract', 
+    numerical_columns = ['subscription_age', 'bill_avg', 'remaining_contract', 
                          'download_avg', 'upload_avg']
 
     # Масштабування числових змінних
@@ -18,4 +18,3 @@ def preprocess_user_data(data: pd.DataFrame, scaler_path: str) -> pd.DataFrame:
     data[numerical_columns] = scaler.transform(data[numerical_columns])
 
     return data
-
