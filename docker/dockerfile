@@ -24,6 +24,8 @@ RUN poetry config virtualenvs.create false \
 # Копіюємо решту файлів проекту
 COPY . .
 
+ENV PYTHONPATH=/app
+
 # Визначаємо порт для Dash
 EXPOSE 8050
 
