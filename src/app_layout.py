@@ -7,10 +7,13 @@ def app_layout():
         html.Div(className='container d-flex flex-wrap', children=[
             html.Ul(className='nav me-auto', children=[
                 html.Li(className="nav-item", children=[
-                    html.A(className="nav-link active", href="#", children="Home")
+                    html.A(className="nav-link active", href="/", children="Головна")
                 ]),
                 html.Li(className="nav-item", children=[
-                    html.A(className="nav-link", href="#footer", children="Contributors")
+                    html.A(className="nav-link", href="#footer", children="Автори")
+                ]),
+                html.Li(className="nav-item", children=[
+                    html.A(className="nav-link", href="#history-graph", children="Історія прогнозів")
                 ])
             ]),
             html.Ul(className='nav', children=[
@@ -18,7 +21,7 @@ def app_layout():
                     html.A(className="nav-link active", href="#", children="Sign up")
                 ]),
                 html.Li(className="nav-item", children=[
-                    html.A(className="nav-link", href="#footer", children="Login")
+                    html.A(className="nav-link", href="#", children="Login")
                 ])
             ])
         ])

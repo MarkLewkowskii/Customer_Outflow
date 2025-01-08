@@ -228,7 +228,7 @@ def register_callbacks(app):
             with open(result_path) as f:
                 model_data = json.load(f)
 
-            print("JSON дані успішно завантажені:", model_data)
+            # print("JSON дані успішно завантажені:", model_data)
 
             # Структурування даних
             data = []
