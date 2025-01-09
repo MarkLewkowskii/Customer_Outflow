@@ -1,0 +1,122 @@
+{
+    "RandomForest": {
+        "classification_report": {
+            "0": {
+                "precision": 0.9274580335731415,
+                "recall": 0.9443003204639097,
+                "f1-score": 0.9358034026465029,
+                "support": 6553.0
+            },
+            "1": {
+                "precision": 0.9531029166131312,
+                "recall": 0.9387496836243989,
+                "f1-score": 0.9458718520879822,
+                "support": 7902.0
+            },
+            "accuracy": 0.9412659979245935,
+            "macro avg": {
+                "precision": 0.9402804750931364,
+                "recall": 0.9415250020441543,
+                "f1-score": 0.9408376273672425,
+                "support": 14455.0
+            },
+            "weighted avg": {
+                "precision": 0.941477118027102,
+                "recall": 0.9412659979245935,
+                "f1-score": 0.9413074419053454,
+                "support": 14455.0
+            }
+        },
+        "model_size_mb": 59.7475061416626
+    },
+    "GradientBoosting": {
+        "classification_report": {
+            "0": {
+                "precision": 0.9219475655430711,
+                "recall": 0.9391118571646574,
+                "f1-score": 0.9304505594194133,
+                "support": 6553.0
+            },
+            "1": {
+                "precision": 0.9487146529562982,
+                "recall": 0.934067324727917,
+                "f1-score": 0.9413340135186838,
+                "support": 7902.0
+            },
+            "accuracy": 0.9363542026980284,
+            "macro avg": {
+                "precision": 0.9353311092496847,
+                "recall": 0.9365895909462871,
+                "f1-score": 0.9358922864690487,
+                "support": 14455.0
+            },
+            "weighted avg": {
+                "precision": 0.9365801165454455,
+                "recall": 0.9363542026980284,
+                "f1-score": 0.9364001307990354,
+                "support": 14455.0
+            }
+        },
+        "model_size_mb": 0.18355941772460938
+    },
+    "HistGradientBoosting": {
+        "classification_report": {
+            "0": {
+                "precision": 0.9299669371806433,
+                "recall": 0.9443003204639097,
+                "f1-score": 0.9370788218369047,
+                "support": 6553.0
+            },
+            "1": {
+                "precision": 0.9532111267786181,
+                "recall": 0.9410275879524171,
+                "f1-score": 0.9470801757625932,
+                "support": 7902.0
+            },
+            "accuracy": 0.9425112417848496,
+            "macro avg": {
+                "precision": 0.9415890319796307,
+                "recall": 0.9426639542081634,
+                "f1-score": 0.942079498799749,
+                "support": 14455.0
+            },
+            "weighted avg": {
+                "precision": 0.9426736536250013,
+                "recall": 0.9425112417848496,
+                "f1-score": 0.9425461825232271,
+                "support": 14455.0
+            }
+        },
+        "model_size_mb": 0.35753631591796875
+    },
+    "LogisticRegression": {
+        "classification_report": {
+            "0": {
+                "precision": 0.8514401212733704,
+                "recall": 0.7714024111094155,
+                "f1-score": 0.8094475580464372,
+                "support": 6553.0
+            },
+            "1": {
+                "precision": 0.8241371213899976,
+                "recall": 0.8883826879271071,
+                "f1-score": 0.8550548112058465,
+                "support": 7902.0
+            },
+            "accuracy": 0.8353510895883777,
+            "macro avg": {
+                "precision": 0.8377886213316841,
+                "recall": 0.8298925495182613,
+                "f1-score": 0.8322511846261418,
+                "support": 14455.0
+            },
+            "weighted avg": {
+                "precision": 0.8365146072589524,
+                "recall": 0.8353510895883777,
+                "f1-score": 0.8343793127656106,
+                "support": 14455.0
+            }
+        },
+        "model_size_mb": 0.0013875961303710938
+    }
+}

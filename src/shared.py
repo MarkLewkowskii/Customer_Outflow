@@ -15,7 +15,7 @@ PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
 RAW_DIR = os.path.join(DATA_DIR, "raw")
 
 MODELS_DIR = os.path.join(BASE_DIR, "models")
-RESULTS_DIR = os.path.join(BASE_DIR, "results")
+RESULTS_DIR = os.path.join(RAW_DIR, "results")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 
 # Шляхи до файлів

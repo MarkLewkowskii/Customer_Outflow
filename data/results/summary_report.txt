@@ -1,0 +1,26 @@
+1. Пропущені значення
+                             Відсутні значення  % Пропусків
+id                                           0     0.000000
+is_tv_subscriber                             0     0.000000
+is_movie_package_subscriber                  0     0.000000
+subscription_age                             0     0.000000
+bill_avg                                     0     0.000000
+remaining_contract                       21572    29.847525
+service_failure_count                        0     0.000000
+download_avg                               381     0.527161
+upload_avg                                 381     0.527161
+download_over_limit                          0     0.000000
+churn                                        0     0.000000
+
+2. Візуалізації
+histograms.png: Розподіли числових змінних.
+boxplots.png: Коробкові графіки для виявлення викидів.
+correlation_matrix.png: Кореляційна матриця.
+
+3. Основні висновки
+Пропущені дані у змінній `remaining_contract` можуть впливати на точність аналізу.
+Сильна кореляція між `download_avg` та `upload_avg`.
+
+4. Рекомендації
+Імпутувати пропуски у змінній `remaining_contract` за допомогою медіани.
+Оптимізувати змінні `download_avg` та `upload_avg` через високу кореляцію.

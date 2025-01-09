@@ -64,11 +64,11 @@
 
 ### Вихідні графіки:
 1. **Порівняння точності моделей**:
-   - ![Порівняння точності моделей](results/accuracy_comparison.png)
+   - ![Порівняння точності моделей](data/results/accuracy_comparison.png)
 2. **Розмір моделей**:
-   - ![Розмір моделей](results/model_size_comparison.png)
+   - ![Розмір моделей](data/results/model_size_comparison.png)
 3. **Розмір моделей**:
-   - ![F1-метрика моделі](results/f1_score_comparison.png)
+   - ![F1-метрика моделі](data/results/f1_score_comparison.png)
 
 
 ---
