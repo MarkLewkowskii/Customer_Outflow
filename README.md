@@ -110,16 +110,42 @@
 .
 ├── data
 │   ├── processed
+│   │   ├── feature_names.json
 │   │   ├── medians.json
 │   │   ├── processed_data.csv
-│   │   └── scaler.pkl
+│   │   ├── scaler_feature_names.json
+│   │   ├── scaler.pkl
+│   │   ├── summary_report.txt
+│   │   └── test_data.csv
 │   ├── raw
 │   │   └── internet_service_churn.csv
-│   └── README.md
+│   ├── README.md
+│   └── results
+│       ├── accuracy_comparison.png
+│       ├── f1_score_comparison.png
+│       ├── initial_report.json
+│       ├── model_evaluation.json
+│       ├── model_size_comparison.png
+│       ├── summary_report.txt
+│       ├── test_1
+│       │   └── report_after.json
+│       ├── test_2
+│       │   └── report_after.json
+│       ├── test_3
+│       │   └── report_after.json
+│       ├── test_4
+│       │   └── report_after.json
+│       ├── test_5
+│       │   └── report_after.json
+│       └── visualizations
+│           ├── boxplots.png
+│           ├── correlation_matrix.png
+│           └── histograms.png
 ├── docker
 │   ├── docker-compose.yml
 │   ├── dockerfile
 │   └── README.md
+├── koyeb.yaml
 ├── models
 │   ├── model_GradientBoosting.joblib
 │   ├── model_HistGradientBoosting.joblib
@@ -128,27 +154,39 @@
 ├── nixpacks.toml
 ├── notebooks
 │   ├── 01_Analyze_EDA.ipynb
+│   ├── 01_analyze_eda.py
 │   ├── 02_preprocessing.ipynb
+│   ├── 02_preprocessing.py
 │   ├── 03_model_training.ipynb
+│   ├── 03_model_training.py
 │   ├── 04_evaluation.ipynb
+│   ├── 04_evaluation.py
 │   └── README.md
 ├── poetry.lock
 ├── pyproject.toml
 ├── README.md
 ├── requirements.txt
-├── results
-│   ├── accuracy_comparison.png
-│   ├── f1_score_comparison.png
-│   ├── model_evaluation.json
-│   └── model_size_comparison.png
 └── src
+    ├── app_layout.py
+    ├── assets
+    │   ├── css
+    │   ├── fonts
+    │   ├── images
+    │   ├── js
+    │   └── scss
+    ├── callbacks.py
     ├── data_preparation.py
     ├── evaluation.py
     ├── faker_new_client.py
     ├── graph_processing.py
     ├── __init__.py
     ├── model_training.py
-    └── README.md
+    ├── README.md
+    ├── run_pipeline.py
+    ├── shared.py
+    ├── test.py
+    └── train_incremental.py
+
 
 ```
 
