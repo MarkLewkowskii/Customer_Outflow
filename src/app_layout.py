@@ -1,5 +1,15 @@
 from dash import dcc, html
 
+images = [
+    {"src": "/assets/images/accuracy_comparison.png", "alt": "Точність моделей", "caption": "Точність моделей"},
+    {"src": "/assets/images/f1_score_comparison.png", "alt": "F1 Score", "caption": "Порівняння F1 Score"},
+    {"src": "/assets/images/model_size_comparison.png", "alt": "Розмір моделей", "caption": "Розмір моделей"},
+    {"src": "/assets/images/correlation_matrix.png", "alt": "Кореляційна матриця", "caption": "Кореляційна матриця"},
+    {"src": "/assets/images/histograms.png", "alt": "Гістограми", "caption": "Гістограми"},
+    {"src": "/assets/images/boxplots.png", "alt": "Boxplots", "caption": "Boxplots"}
+]
+
+
 def app_layout():
     return html.Div(className='d-flex flex-column h-100', children=[
     # Header/NavBar
@@ -244,7 +254,7 @@ def app_layout():
                 ]),
                 html.Div(className='row', children=[
                     # Table Block (Active Projects)
-                    html.Div(className='col mb-5', children=[
+                    html.Div(className='col-lg-4 col-md-4 col-sm-12 mb-1', children=[
                         html.Div(className='card', children=[
                             html.Div(className='card-header', children=[
                                 html.H4("Введені дані", className='mb-0')
@@ -282,7 +292,7 @@ def app_layout():
                         ])
                     ]),
                     # Circular Graph Block (Tasks Performance)
-                    html.Div(className='col mb-5', children=[
+                    html.Div(className='col-lg-8 col-md-8 col-sm-12 mb-6', children=[
                         html.Div(className='card', children=[
                             html.Div(className='card-header d-flex align-items-center justify-content-between',
                                      children=[
@@ -302,12 +312,86 @@ def app_layout():
                 ]),
                 # Графік історії прогнозів
                 html.Div(className='row', children=[
-                    html.Div(className='card', children=[
-                        html.Div(className='card-header', children=[
-                            html.H4("Історія прогнозів", className='mb-0')
-                        ]),
-                        html.Div(className='card-body', children=[
-                            dcc.Graph(id="history-graph")
+                    # Графік історії прогнозів (50%)
+                    html.Div(className='col-lg-6', children=[
+                        html.Div(className='card', children=[
+                            html.Div(className='card-header', children=[
+                                html.H4("Історія прогнозів", className='mb-0')
+                            ]),
+                            html.Div(className='card-body', children=[
+                                dcc.Graph(id="history-graph", style={"height": "400px"})
+                            ])
+                        ])
+                    ]),
+                    # Слайдер зображень (50%)
+                    html.Div(className='col-lg-6', children=[
+                        html.Div(className="card", children=[
+                            html.Div(className='card-header', children=[
+                                html.H4("Статистичні дані", className="mb-0")
+                            ]),
+                            html.Div(className='card-body', children=[
+                                html.Div(
+                                    className='carousel slide',
+                                    id='carouselExampleIndicators',
+                                    **{
+                                        "data-bs-ride": "carousel",
+                                        "data-bs-interval": "3000"  # Автоматична прокрутка кожні 3 секунди
+                                    },
+                                    children=[
+                                        # Індикатори (підсвічені точки)
+                                        html.Ol(className='carousel-indicators', children=[
+                                            html.Li(**{
+                                                "data-bs-target": "#carouselExampleIndicators",
+                                                "data-bs-slide-to": str(idx),
+                                                "className": "active" if idx == 0 else ""
+                                            }) for idx in range(len(images))
+                                        ]),
+
+                                        # Вміст каруселі
+                                        html.Div(className='carousel-inner', children=[
+                                            html.Div(
+                                                className=f'carousel-item {"active" if idx == 0 else ""}',
+                                                children=[
+                                                    html.Img(
+                                                        src=img["src"],
+                                                        className="d-block w-100",
+                                                        alt=img["alt"]
+                                                    ),
+                                                    html.Div(className="carousel-caption d-none d-md-block",
+                                                             children=[
+                                                                 html.H5(f"Слайд {idx + 1}"),
+                                                                 html.P(img["caption"])
+                                                             ])
+                                                ]
+                                            ) for idx, img in enumerate(images)
+                                        ]),
+
+                                        # Елементи управління
+                                        html.A(
+                                            className="carousel-control-prev",
+                                            href="#carouselExampleIndicators",
+                                            role="button",
+                                            **{"data-bs-slide": "prev"},
+                                            children=[
+                                                html.Span(className="carousel-control-prev-icon",
+                                                          **{"aria-hidden": "true"}),
+                                                html.Span("Previous", className="visually-hidden")
+                                            ]
+                                        ),
+                                        html.A(
+                                            className="carousel-control-next",
+                                            href="#carouselExampleIndicators",
+                                            role="button",
+                                            **{"data-bs-slide": "next"},
+                                            children=[
+                                                html.Span(className="carousel-control-next-icon",
+                                                          **{"aria-hidden": "true"}),
+                                                html.Span("Next", className="visually-hidden")
+                                            ]
+                                        )
+                                    ]
+                                )
+                            ])
                         ])
                     ])
                 ])
@@ -316,10 +400,10 @@ def app_layout():
     ]),
 
         # Footer
-        html.Footer(className="footer mt-8 py-3 bg-light", children=[
-            html.Div(id='footer', className="container", children=[
-                html.H5("Автори", className="text-uppercase fw-bold"),
-                html.Ul(className="list-unstyled", children=[
+        html.Div(className="conteiner", children=[
+            html.Footer(id='footer', className="footer py-3 my-4 bg-light", children=[
+                html.H5("Автори", className="text-uppercase text-center fw-bold"),
+                html.Ul(className="list-unstyled text-center", children=[
                     html.Li("Maryna Dudik - Team Lead: Організація роботи, документація."),
                     html.Li("Heorhii Kaplytskyi - Scrum-master: Організація роботи, документація."),
                     html.Li("Gleb - Data Analyst: Аналіз даних."),
@@ -327,7 +411,13 @@ def app_layout():
                     html.Li("Liana Lotarets - Data Scientist: Навчання моделей."),
                     html.Li("Inna Bogutska - Backend Developer: Реалізація інтерфейсу."),
                     html.Li("Maryna Dudik - DevOps-інженер: Контейнеризація.")
-                ])
+                ]),
+
+                html.P(className="text-center text-body-secondary", children=[
+                    html.H5("© 2025, Design by KAGEV", className="text-center text-body-secondary"),
+
+
             ])
         ])
     ])
+])
