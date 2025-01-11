@@ -1,12 +1,12 @@
 from dash import dcc, html
 
 images = [
-    {"src": "/assets/images/accuracy_comparison.png", "alt": "Точність моделей", "caption": "Точність моделей"},
-    {"src": "/assets/images/f1_score_comparison.png", "alt": "F1 Score", "caption": "Порівняння F1 Score"},
-    {"src": "/assets/images/model_size_comparison.png", "alt": "Розмір моделей", "caption": "Розмір моделей"},
-    {"src": "/assets/images/correlation_matrix.png", "alt": "Кореляційна матриця", "caption": "Кореляційна матриця"},
-    {"src": "/assets/images/histograms.png", "alt": "Гістограми", "caption": "Гістограми"},
-    {"src": "/assets/images/boxplots.png", "alt": "Boxplots", "caption": "Boxplots"}
+    {"src": "assets/images/accuracy_comparison.png", "alt": "Точність моделей", "caption": "Точність моделей"},
+    {"src": "assets/images/f1_score_comparison.png", "alt": "F1 Score", "caption": "Порівняння F1 Score"},
+    {"src": "assets/images/model_size_comparison.png", "alt": "Розмір моделей", "caption": "Розмір моделей"},
+    {"src": "assets/images/correlation_matrix.png", "alt": "Кореляційна матриця", "caption": "Кореляційна матриця"},
+    {"src": "assets/images/histograms.png", "alt": "Гістограми", "caption": "Гістограми"},
+    {"src": "assets/images/boxplots.png", "alt": "Boxplots", "caption": "Boxplots"}
 ]
 
 
