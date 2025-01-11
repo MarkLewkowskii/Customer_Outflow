@@ -331,7 +331,7 @@ def app_layout():
                             ]),
                             html.Div(className='card-body', children=[
                                 html.Div(
-                                    className='carousel slide',
+                                    className='carousel carousel-dark slide',
                                     id='carouselExampleIndicators',
                                     **{
                                         "data-bs-ride": "carousel",
